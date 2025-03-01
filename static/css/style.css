@@ -1,0 +1,234 @@
+/* เพิ่มสไตล์ที่ใช้ร่วมกัน */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-image: url('https://www.theglobaleconomics.com/wp-content/uploads/2020/08/aerial-top-view-of-a-solar-panels-power-plant.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+.dash header {
+    background-color: rgb(11, 59, 13);
+    display: flex;
+    justify-content: space-between; /* จัดให้ h1 อยู่ซ้าย ปุ่มอยู่ขวา */
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed; /* Fix header at the top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure header is above other elements */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dash-container {
+    background: rgb(255, 255, 255);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dash h1 {
+    color: rgb(255, 255, 255);
+    margin: 0;
+}
+
+.dash h2 {
+    color: rgb(11, 59, 13);
+    margin: 0;
+}
+
+.dash p {
+    color: rgb(11, 59, 13);
+    margin: 0;
+}
+
+.green-link {
+    color: rgb(11, 59, 13); /* สีเขียวเข้ม */
+    text-decoration: none;
+}
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.login-container {
+    background: rgb(255, 255, 255);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.login-container h1 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: rgb(11, 59, 13);
+}
+
+.login-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container form input {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.login-container form button {
+    padding: 10px;
+    background-color: rgb(11, 59, 13);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.login-container form button:hover {
+    background-color: rgb(3, 39, 4);
+}
+
+.login-container p {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.login-container a {
+    color: rgb(11, 59, 13);
+    text-decoration: none;
+}
+
+.login-container a:hover {
+    text-decoration: underline;
+}
+
+/* register styles */
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-google img {
+    width: 20px;
+    margin-right: 10px;
+}
+
+.btn-google:hover {
+    background-color: #f1f1f1;
+}
+
+.register-container {
+    background: rgb(255, 255, 255); /* พื้นหลังสีขาว */
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* เพิ่มเงาเพื่อให้ดูมีมิติ */
+}
+
+.register-container h1 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: rgb(11, 59, 13); /* สีเขียว */
+}
+
+.register-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-container form label {
+    text-align: left;
+    margin-bottom: 5px;
+    color: #333; /* สีข้อความเข้มขึ้น */
+}
+
+.register-container form input,
+.register-container form select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.register-container form button {
+    padding: 10px;
+    background-color: rgb(11, 59, 13); /* สีเขียว */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.register-container form button:hover {
+    background-color: rgb(3, 39, 4); /* สีเขียวเข้มเมื่อ hover */
+}
+
+.register-container p {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #333; /* สีข้อความเข้มขึ้น */
+}
+
+.register-container a {
+    color: rgb(11, 59, 13); /* สีเขียว */
+    text-decoration: none;
+}
+
+.register-container a:hover {
+    text-decoration: underline;
+}
+
+.messages {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f8d7da; /* สีพื้นหลังสำหรับข้อความแจ้งเตือน */
+    color: #721c24; /* สีข้อความสำหรับข้อความแจ้งเตือน */
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    list-style: none;
+    text-align: left;
+}
+
+.messages li {
+    margin-bottom: 5px;
+}
