@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}register - SolarCell Dashboard{% endblock %}
+{% block class_name %}register-container{% endblock %}
+
+{% block content %}
+    <h1>REGISTER</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password1">Password:</label>
+        <input type="password" id="password1" name="password1" required>
+
+        <label for="password2">Confirm Password:</label>
+        <input type="password" id="password2" name="password2" required>
+
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+            <option value="plant_owner">Plant Owner</option>
+            <option value="data_analyst">Data Analyst</option>
+            <option value="drone_controller">Drone Controller</option>
+        </select>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="{% url 'login_page' %}">Login here</a></p>
+
+    <!-- แสดงข้อความแจ้งเตือน -->
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}

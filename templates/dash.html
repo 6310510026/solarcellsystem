@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hide side{% endblock %}</title>
+    <!-- เชื่อมโยงไฟล์ CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="dash">
+    <header>
+        {% block header  %}
+        <h1>Solar Cell Maintenance System</h1>
+        {% endblock  %}
+    </header>
+    
+    <!-- Block for main content (can be extended by other templates) -->
+    <div class="{% block class_name %}dash-container{% endblock %}">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

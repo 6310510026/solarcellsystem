@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Login - SolarCell Dashboard{% endblock %}
+{% block content %}
+    <h1>LOGIN</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register_page' %}">REGISTER NOW!</a></p>
+
+    <a href="{% provider_login_url 'google' %}">
+        <button class="btn-google">
+            <img src="https://playtht-website-assets.s3.amazonaws.com/img/brand/google.svg" alt="Google logo"/>
+            Sign up with Google
+        </button>
+    </a>
+{% endblock %}
