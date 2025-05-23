@@ -1,0 +1,18 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+{% block title %}Upload Image{% endblock %}
+
+{% block content %}
+<h2>อัปโหลดภาพจากโดรน</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">อัปโหลด</button>
+</form>
+<br>
+<a href="{% url 'drone_status' %}" class="btn-upload">Back</a>
+{% endblock %}
