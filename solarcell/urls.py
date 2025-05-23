@@ -17,9 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('accounts.urls')),
-    path("accounts/",include("allauth.urls"),name="socialaccount_signup"), # Allauth urls
+    path('accounts/', include('accounts.urls')),  # เพิ่มตรงนี้
 ]

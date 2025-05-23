@@ -1,5 +1,5 @@
-/* เพิ่มสไตล์ที่ใช้ร่วมกัน */
-body {
+/* login และ register เท่านั้น */
+body:not(.dash) {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
@@ -12,6 +12,17 @@ body {
     justify-content: center;
     align-items: center;
     color: #fff;
+}
+
+/* dashboard */
+body.dash {
+    display: block;
+    height: auto;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    background-image: url('https://www.theglobaleconomics.com/wp-content/uploads/2020/08/aerial-top-view-of-a-solar-panels-power-plant.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .dash header {
@@ -28,13 +39,15 @@ body {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+
 .dash-container {
     background: rgb(255, 255, 255);
     padding: 40px;
     border-radius: 10px;
     text-align: center;
     width: 100%;
-    max-width: 400px;
+    max-width: 800px; /* เพิ่มความกว้างถ้าต้องการ */
+    margin: 80px auto 40px auto; /* ✅ อยู่ใต้ header และกึ่งกลางแนวนอน */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -125,6 +138,13 @@ body {
 
 .login-container a:hover {
     text-decoration: underline;
+}
+
+.login-container form label {
+    text-align: left;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
 }
 
 /* register styles */
@@ -232,3 +252,46 @@ body {
 .messages li {
     margin-bottom: 5px;
 }
+
+/* Navbar */
+
+.menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 0;
+    background-color: #ffffff;
+}
+
+.menu li a {
+    color: #0b3b0d;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.menu li a:hover {
+    text-decoration: underline;
+}
+
+.navbar {
+    padding-left: 30px;
+    margin: 0;
+    text-align: left;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    justify-content: flex-start;  /* ✅ ชิดซ้าย */
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-list li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+

@@ -1,0 +1,16 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Drone Controller Dashboard{% endblock %}
+
+{% block content %}
+    <p>Do Your best!  {{ request.user.username }}</p>
+    <br>
+    <p>This is the Drone Controller dashboard</p>
+    <!-- เพิ่มข้อมูลที่ต้องการแสดงเฉพาะสำหรับ Plant Owner -->
+     <br>
+     <a href="{% url 'logout_page' %}">LOGOUT</a>
+{% endblock %}
