@@ -1,24 +1,21 @@
 # solarcell
 
 plant owner-->
-username : sunny
-email : sunny@mail.com
-password : qwertyui098
+username : test2
+email : 
+password : iamuser2
 
-username : lisa
-email : lisa@mail.com
-password : iamlisa1234
 
 data analyst -->
-username: dada
-email: dada@mail.com
-password: poiuytre123
+username: 
+email: 
+password: 
 
 drone controller -->
-username: jane
-email: jane@mail.com
-password: iamjane1234
+username: sureeyanee
+email:
+password: thisissunny123
 
 super user (admin) --> (login ด้วย admin site)
-username: tester
-password: 1234
+username: admin
+password: 123

@@ -162,12 +162,13 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
-LOGIN_REDIRECT_URL = 'success'
+LOGIN_REDIRECT_URL = '/accounts/redirect/'
+
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 CSRF_COOKIE_SECURE = False  # ตั้งให้เป็น False สำหรับ development (local) และ True สำหรับ production
 CSRF_TRUSTED_ORIGINS = [
