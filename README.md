@@ -7,9 +7,9 @@ password : iamuser2
 
 
 data analyst -->
-username: 
+username: test4
 email: 
-password: 
+password: iamuser4
 
 drone controller -->
 username: sureeyanee

@@ -1,0 +1,59 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+{% block title %}Drone Upload Status{% endblock %}
+
+
+{% block content %}
+<h2 style="text-align: left;">Status Update</h2>
+<br>
+
+<table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
+  <thead style="background:#0b3b0d; color:white;">
+    <tr>
+      <th>Date</th>
+      <th>Solar Plant</th>
+      <th>Zone</th>
+      <th>Image</th>
+      <th>Status</th>
+      <th>Analyzed by</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in inspections %}
+    <tr>
+      <td>{{ i.captured_at|date:"d/m/Y H:i" }}</td>
+      <td>{{ i.plant.name }}</td>
+      <td>{{ i.zone.name }}</td>
+      <td>
+        <img src="{{ i.image.url }}" alt="inspection" style="height:100px;">
+      </td>
+      <td>
+        {% if i.status == 'pending' %}
+          <span style="color: gray;">Pending</span>
+        {% elif i.status == 'analyzed' %}
+          <span style="color: green;">Analyzed (No Issue)</span>
+        {% elif i.status == 'issue_found' %}
+          <span style="color: orange;">Issue Found</span>
+        {% elif i.status == 'complete' %}
+          <span style="color: blue;">Resolved</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if i.analyzed_by %}
+          {{ i.analyzed_by.username }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">You haven’t uploaded any images yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+<a href="{% url 'upload_inspection' %}" class="btn-upload">Upload</a>
+{% endblock %}

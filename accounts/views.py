@@ -29,24 +29,35 @@ def register_user(request):
             password=password1,
             role=role
         )
-        messages.success(request, "Registered successfully. Please log in.")
-        return redirect('login_page')
+        user.is_active = False  # 🔴 ปิดการใช้งานจนกว่า admin จะอนุมัติ
+        user.save()
 
+        messages.success(request, "ลงทะเบียนสำเร็จ! โปรดรอผู้ดูแลระบบอนุมัติบัญชีก่อนเข้าใช้งาน")
+        return redirect('login_page')
     return render(request, 'register.html')
 
 # ---------- LOGIN ----------
 def login_user(request):
     if request.method == 'POST':
-        username = request.POST.get('username')  # หรือใช้ email ถ้าใช้ email login
+        username = request.POST.get('username')
         password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
+        try:
+            user = User.objects.get(username=username)
+            if not user.is_active:
+                messages.warning(request, "บัญชีของคุณยังไม่ได้รับการอนุมัติจากผู้ดูแลระบบ")
+                return redirect('login_page')
+        except User.DoesNotExist:
+            messages.error(request, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+            return redirect('login_page')
 
+        # ตรวจ password แบบ manual
+        user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('role_redirect')
         else:
-            messages.error(request, "Invalid credentials")
+            messages.error(request, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
             return redirect('login_page')
 
     return render(request, 'login.html')

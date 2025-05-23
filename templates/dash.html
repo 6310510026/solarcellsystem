@@ -11,15 +11,11 @@
 </head>
 <body class="dash">
     <header>
-        {% block header  %}
+    <div class="header-top">
         <h1>Solar Cell Maintenance System</h1>
-        <a href="{% url 'logout_page' %}" class="green-link">Logout</a>
-        {% endblock  %}
-    </header>
-        <br>
-        <br>
-        {% block navbar %}
-        <nav class="navbar">
+    </div>
+    {% block navbar %}
+    <nav class="navbar">
         {% if request.user.role == 'plant_owner' %}
             {% include 'navbars/navbar_plant_owner.html' %}
         {% elif request.user.role == 'data_analyst' %}
@@ -27,8 +23,9 @@
         {% elif request.user.role == 'drone_controller' %}
             {% include 'navbars/navbar_drone_controller.html' %}
         {% endif %}
-        </nav>
-        {% endblock %}
+    </nav>
+    {% endblock %}
+    </header>
     <!-- Block for main content (can be extended by other templates) -->
     <div class="{% block class_name %}dash-container{% endblock %}">
         {% block content %}

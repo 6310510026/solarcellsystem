@@ -16,8 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import nested_admin
+from django.conf import settings  # ✅ ต้องมี
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('_nested_admin/', include('nested_admin.urls')),
     path('accounts/', include('accounts.urls')),  # เพิ่มตรงนี้
+    #path('plant/', include('plant.urls')),
+    path('drone/', include('drone.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
