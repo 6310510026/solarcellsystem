@@ -21,6 +21,5 @@ class ZoneInline(nested_admin.NestedStackedInline):
 
 @admin.register(SolarPlant)
 class SolarPlantAdmin(nested_admin.NestedModelAdmin):
-    list_display = ('name', 'location', 'owner')
+    list_display = ('name', 'location', 'owner', 'data_analyst', 'drone_controller')  # ✅ เพิ่ม 2 ตำแหน่งนี้ให้เห็นใน list
     inlines = [ZoneInline]
-

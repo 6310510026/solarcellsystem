@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('_nested_admin/', include('nested_admin.urls')),
     path('accounts/', include('accounts.urls')),  # เพิ่มตรงนี้
-    #path('plant/', include('plant.urls')),
+    path('plant/', include('plant.urls')),
     path('drone/', include('drone.urls')),
 ]
 

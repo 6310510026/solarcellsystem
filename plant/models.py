@@ -21,6 +21,23 @@ class SolarPlant(models.Model):
     description = models.TextField(blank=True, verbose_name="รายละเอียดเพิ่มเติม")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    data_analyst = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        limit_choices_to={'role': 'data_analyst'},
+        related_name='assigned_analyst_plants',
+        verbose_name="นักวิเคราะห์ข้อมูล"
+    )
+    drone_controller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        limit_choices_to={'role': 'drone_controller'},
+        related_name='assigned_drone_plants',
+        verbose_name="ผู้ควบคุมโดรน"
+    )
+    
     def __str__(self):
         return f"{self.name} ({self.location})"
 
