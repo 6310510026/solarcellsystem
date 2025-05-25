@@ -1,18 +1,60 @@
 {% extends 'dash.html' %}
 {% load static %}
-{% block style %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-{% endblock %}
+
 {% block title %}Upload Image{% endblock %}
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block class_name %}upload-form-container{% endblock %}
 
 {% block content %}
-<h2>อัปโหลดภาพจากโดรน</h2>
-
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">อัปโหลด</button>
-</form>
+<h2 class="upload-title">Upload Image</h2>
 <br>
-<a href="{% url 'drone_status' %}" class="btn-upload">Back</a>
+<form method="post" enctype="multipart/form-data" class="upload-grid-form" id="upload_form">
+  {% csrf_token %}
+  <div class="form-fields">
+    <label for="id_plant">Solar Plant Name :</label>
+    {{ form.plant }}
+
+    <label for="id_zone">Solar Plant Zone :</label>
+    {{ form.zone }}
+
+    <label for="id_image">Image Files :</label>
+    {{ form.image }}
+
+    <label for="id_captured_date">Image Date:</label>
+    {{ form.captured_date }}
+
+    <label for="id_captured_time">Image Time:</label>
+    {{ form.captured_time }}
+
+
+  </div>
+
+  <div class="image-preview">
+    <label><strong>Image Preview:</strong></label>
+    <div class="image-box">
+      <img id="preview" src="https://cdn-icons-png.flaticon.com/512/1829/1829543.png" alt="preview">
+    </div>
+  </div>
+</form>
+
+<div class="button-group">
+  <button type="submit" form="upload_form" class="btn-green">Save</button>
+  <a href="{% url 'drone_status' %}" class="btn-outline">Back</a>
+</div>
+
+<script>
+  document.getElementById("id_image").addEventListener("change", function (e) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      document.getElementById("preview").src = event.target.result;
+      document.getElementById("preview").style.opacity = 1;
+    };
+    if (e.target.files.length > 0) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  });
+</script>
 {% endblock %}

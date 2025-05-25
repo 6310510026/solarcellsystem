@@ -17,6 +17,10 @@ class DroneInspection(models.Model):
     captured_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to="inspections/")
     description = models.TextField(blank=True)
+    captured_date = models.DateField(verbose_name="Image Date")
+    captured_time = models.TimeField(verbose_name="Image Time")
+
+    # ✅ เวลาที่ระบบบันทึกจริง
     captured_at = models.DateTimeField(auto_now_add=True)
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

@@ -1,0 +1,41 @@
+{% extends 'dash.html' %}
+{% load static %}
+
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Create Solar Plant{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+  <h2 class="upload-title">Create Solar Plant</h2>
+  <br>
+  <form method="post" class="upload-grid-form" id="plant_form">
+    {% csrf_token %}
+    <div class="form-fields">
+        <label for="id_name">Plant Name:</label>
+        {{ form.name }}
+
+        <label for="id_location">Location:</label>
+        {{ form.location }}
+
+        <label for="id_installed_capacity_kw">Installed Capacity (kW):</label>
+        {{ form.installed_capacity_kw }}
+
+        <label for="id_description">Description:</label>
+        {{ form.description }}
+
+        <label for="id_data_analyst">Data Analyst:</label>
+        {{ form.data_analyst }}
+
+        <label for="id_drone_controller">Drone Controller:</label>
+        {{ form.drone_controller }}
+    </div>
+  </form>
+
+  <div class="button-group">
+    <button type="submit" form="plant_form" class="btn-green">Save</button>
+      <a href="{% url 'plant_list' %}" class="btn-outline">Back</a>
+  </div>
+{% endblock %}
