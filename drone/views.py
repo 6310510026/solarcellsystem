@@ -3,9 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import DroneInspection
+from plant.models import SolarPlant
 from .forms import DroneInspectionForm # คุณต้องมี forms.py และ DroneInspectionForm ที่ถูกต้อง
 from django.conf import settings # ถ้าคุณใช้ settings เช่น settings.AUTH_USER_MODEL โดยตรง
 # from django.utils import timezone # ไม่จำเป็นใน view นี้ถ้า model ไม่ได้ใช้ timezone ใน save() พิเศษ
+
+
 
 # =============================
 # DRONE CONTROLLER: Upload View
@@ -89,3 +92,14 @@ def edit_inspection(request, inspection_id):
         form = DroneInspectionForm(instance=inspection)
 
     return render(request, 'dashboard/edit_inspection.html', {'form': form, 'inspection': inspection})
+
+@login_required
+def plant_detail_view(request, plant_id):
+    # ดึงเฉพาะโรงไฟฟ้าที่ drone_controller เป็น user นี้เท่านั้น
+    plant = get_object_or_404(SolarPlant, id=plant_id, drone_controller=request.user)
+
+    zones = plant.zones.prefetch_related('rows__panels')  # ดึงข้อมูลเชิงลึกแบบ efficient
+    return render(request, 'dashboard/plant_detail.html', {
+        'plant': plant,
+        'zones': zones,
+    })

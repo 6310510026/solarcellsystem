@@ -92,7 +92,9 @@ def data_analyst_dashboard_view(request):
 
 @login_required
 def drone_controller_dashboard_view(request):
-    return render(request, 'dashboard/drone_controller_dashboard.html')
+    user = request.user
+    plants = user.assigned_drone_plants.all()
+    return render(request, 'dashboard/drone_controller_dashboard.html', {'plants': plants})
 
 @login_required
 def site_admin_dashboard_view(request):
