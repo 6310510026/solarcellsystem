@@ -1,0 +1,119 @@
+{% extends 'dash.html' %}
+{% load static %}
+
+{% block title %}Edit Inspection{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+
+<h2 class="upload-title">Edit Inspection #{{ inspection.id }}</h2>
+<br>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="padding: 10px; margin-bottom: 15px; border: 1px solid transparent; border-radius: 4px; {% if message.tags == 'success' %}color: #155724; background-color: #d4edda; border-color: #c3e6cb;{% elif message.tags == 'error' %}color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;{% else %}color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb;{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="upload-grid-form" id="edit_form">
+  {% csrf_token %}
+  <div class="form-fields">
+    <div> {# เพิ่ม div ครอบ label และ input เพื่อให้ margin/padding ทำงานได้ตามคาด #}
+        <label for="{{ form.plant.id_for_label }}">Solar Plant Name :</label>
+        {{ form.plant }}
+        {% if form.plant.errors %}
+          <div class="errorlist">{{ form.plant.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <label for="{{ form.zone.id_for_label }}">Solar Plant Zone :</label>
+        {{ form.zone }}
+        {% if form.zone.errors %}
+          <div class="errorlist">{{ form.zone.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <label for="{{ form.image.id_for_label }}">Image File (leave blank to keep current image):</label>
+        {{ form.image }}
+        {% if form.image.errors %}
+          <div class="errorlist">{{ form.image.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <label for="{{ form.captured_date.id_for_label }}">Image Date:</label>
+        {{ form.captured_date }}
+        {% if form.captured_date.errors %}
+          <div class="errorlist">{{ form.captured_date.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <label for="{{ form.captured_time.id_for_label }}">Image Time:</label>
+        {{ form.captured_time }}
+        {% if form.captured_time.errors %}
+          <div class="errorlist">{{ form.captured_time.errors }}</div>
+        {% endif %}
+    </div>
+
+  </div>
+
+  <div class="image-preview">
+    <label><strong>Image Preview:</strong></label> {# Label นี้อาจจะต้องจัดสไตล์เพิ่มถ้าต้องการให้อยู่ตรงกลางหรือชิดซ้าย #}
+    <div class="image-box">
+      <img id="preview"
+           src="{% if inspection.image %}{{ inspection.image.url }}{% else %}https://cdn-icons-png.flaticon.com/512/1829/1829543.png{% endif %}"
+           alt="Image preview"
+           style="max-width: 100%; max-height: 100%; object-fit: contain; opacity: {% if inspection.image %}1{% else %}0.5{% endif %};">
+    </div>
+    {% if inspection.image %}
+    <small style="margin-top: 5px; color: #555;">Current image. Select a new file above to change it.</small>
+    {% endif %}
+  </div>
+</form>
+
+<div class="button-group">
+  <button type="submit" form="edit_form" class="btn-green">Save Changes</button>
+  <a href="{% url 'drone_status' %}" class="btn-outline">Cancel</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById("{{ form.image.id_for_label }}"); // ใช้ id_for_label เพื่อความถูกต้อง
+    const previewImage = document.getElementById("preview");
+    const placeholderImageUrl = "https://cdn-icons-png.flaticon.com/512/1829/1829543.png";
+    // ตรวจสอบว่า inspection.image มีค่าหรือไม่ก่อนที่จะพยายามเข้าถึง .url
+    const currentImageUrl = {% if inspection.image and inspection.image.url %}"{{ inspection.image.url }}"{% else %}"{{ placeholderImageUrl }}"{% endif %};
+
+
+    if (imageInput) {
+        imageInput.addEventListener("change", function (e) {
+            if (e.target.files && e.target.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    previewImage.src = event.target.result;
+                    previewImage.style.opacity = 1;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                previewImage.src = currentImageUrl; // กลับไปแสดงรูปเดิมหรือ placeholder
+                previewImage.style.opacity = (currentImageUrl === placeholderImageUrl) ? 0.5 : 1;
+            }
+        });
+    }
+
+
+    document.querySelectorAll('.errorlist').forEach(function(errorList) {
+    });
+  });
+</script>
+{% endblock %}

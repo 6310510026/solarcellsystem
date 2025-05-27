@@ -10,25 +10,42 @@
 <h2 style="text-align: left;">Status Update</h2>
 <br>
 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="padding: 10px; margin-bottom: 15px; border: 1px solid transparent; border-radius: 4px; {% if message.tags == 'success' %}color: #155724; background-color: #d4edda; border-color: #c3e6cb;{% elif message.tags == 'error' %}color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;{% else %}color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb;{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
 <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
   <thead style="background:#0b3b0d; color:white;">
     <tr>
-      <th>Date</th>
+      <th>Image Date & Time</th> {# เปลี่ยนชื่อคอลัมน์เพื่อความชัดเจน #}
       <th>Solar Plant</th>
       <th>Zone</th>
       <th>Image</th>
       <th>Status</th>
       <th>Analyzed by</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for i in inspections %}
     <tr>
-      <td>{{ i.captured_at|date:"d/m/Y H:i" }}</td>
+      {# --- แก้ไขตรงนี้ --- #}
+      <td>{{ i.captured_date|date:"d/m/Y" }} {{ i.captured_time|time:"H:i" }}</td>
       <td>{{ i.plant.name }}</td>
       <td>{{ i.zone.name }}</td>
       <td>
-        <img src="{{ i.image.url }}" alt="inspection" style="height:100px;">
+        {% if i.image %}
+        <a href="{{ i.image.url }}" target="_blank">
+            <img src="{{ i.image.url }}" alt="inspection {{i.id}}" style="height:100px;">
+        </a>
+        {% else %}
+        No Image
+        {% endif %}
       </td>
       <td>
         {% if i.status == 'pending' %}
@@ -39,6 +56,8 @@
           <span style="color: orange;">Issue Found</span>
         {% elif i.status == 'complete' %}
           <span style="color: blue;">Resolved</span>
+        {% else %}
+          {{ i.get_status_display }}
         {% endif %}
       </td>
       <td>
@@ -48,12 +67,15 @@
           -
         {% endif %}
       </td>
+      <td>
+        <a href="{% url 'edit_inspection' inspection_id=i.id %}" class="btn-blue">Edit</a>
+      </td>
     </tr>
     {% empty %}
-    <tr><td colspan="6">You haven’t uploaded any images yet.</td></tr>
+    <tr><td colspan="7">You haven’t uploaded any images yet.</td></tr>
     {% endfor %}
   </tbody>
 </table>
 <br>
-<a href="{% url 'upload_inspection' %}" class="btn-green">Upload</a>
+<a href="{% url 'upload_inspection' %}" class="btn-green">Upload New Inspection</a>
 {% endblock %}
