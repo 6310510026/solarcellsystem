@@ -15,7 +15,7 @@ def create_plant(request):
             plant = form.save(commit=False)
             plant.owner = request.user
             plant.save()
-            return redirect('plant_list_view')
+            return redirect('plant_list')
     else:
         form = SolarPlantForm(user=request.user)
     return render(request, 'dashboard/create_plant.html', {'form': form})

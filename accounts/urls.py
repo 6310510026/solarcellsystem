@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import register_user, login_user, logout_user, role_redirect, plant_owner_dashboard_view, data_analyst_dashboard_view, drone_controller_dashboard_view
 
+
 urlpatterns = [
     path('signup/', register_user, name='register_page'),
     path('login/', login_user, name='login_page'),
@@ -9,5 +10,4 @@ urlpatterns = [
     path('dashboard/plant-owner/', plant_owner_dashboard_view, name='plant_owner_dashboard'),
     path('dashboard/data-analyst/', data_analyst_dashboard_view, name='data_analyst_dashboard'),
     path('dashboard/drone-controller/', drone_controller_dashboard_view, name='drone_controller_dashboard'),
-    
 ]

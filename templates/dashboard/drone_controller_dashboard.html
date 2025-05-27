@@ -1,15 +1,39 @@
 {% extends 'dash.html' %}
 {% load static %}
 {% block style %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
 {% block title %}Drone Controller Dashboard{% endblock %}
 
+{% block class_name %}upload-form-container{% endblock %}
+
 {% block content %}
-    <p>Do Your best!  {{ request.user.username }}</p>
-    <br>
-    <p>This is the Drone Controller dashboard</p>
-    <!-- เพิ่มข้อมูลที่ต้องการแสดงเฉพาะสำหรับ Plant Owner -->
-    <br>
+  <h2 class="upload-title">Solar Plants Assigned to You</h2>
+
+  <!-- ✅ Debug info -->
+  <pre>{{ request.user.username }} | {{ request.user.role }} | {{ plants|length }}</pre>
+
+  {% if plants %}
+<table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
+  <thead style="background:#0b3b0d; color:white;">
+        <tr>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for plant in plants %}
+          <tr>
+            <td><a href="{% url 'plant_detail' plant.id %}">{{ plant.name }}</a></td>
+            <td>{{ plant.location }}</td>
+            <td>{{ plant.owner.username }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>You are not assigned to any solar plants.</p>
+  {% endif %}
 {% endblock %}
