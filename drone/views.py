@@ -103,3 +103,28 @@ def plant_detail_view(request, plant_id):
         'plant': plant,
         'zones': zones,
     })
+
+@login_required
+def data_analyst_dashboard(request):
+    if not hasattr(request.user, 'role') or request.user.role != 'data_analyst':
+        return redirect('no_permission')
+    
+    # Fetch drone inspection data that needs analysis
+    drone_controller_data = DroneInspection.objects.all().order_by('-captured_at')
+    
+    # Group inspections by status
+    pending_inspections = drone_controller_data.filter(status='pending').count()
+    analyzed_inspections = drone_controller_data.filter(status='analyzed').count()
+    issue_found_inspections = drone_controller_data.filter(status='issue_found').count()
+    completed_inspections = drone_controller_data.filter(status='complete').count()
+    
+    context = {
+        'drone_controller_data': drone_controller_data,
+        'stats': {
+            'pending': pending_inspections,
+            'analyzed': analyzed_inspections,
+            'issues': issue_found_inspections,
+            'completed': completed_inspections
+        }
+    }
+    return render(request, 'dashboard/data_analyst_dashboard.html', context)

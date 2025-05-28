@@ -7,9 +7,71 @@
 {% block title %}Data Analyst Dashboard{% endblock %}
 
 {% block content %}
-    <p>Do Your best!  {{ request.user.username }}</p>
+    <h1 style="font-size:2.2rem; font-weight:bold; margin-bottom: 0.5em; color:#222; text-shadow: 0 1px 2px #eee;">Dashboard</h1>
     <br>
-    <p>This is the Data Analyst dashboard</p>
-    <!-- เพิ่มข้อมูลที่ต้องการแสดงเฉพาะสำหรับ Plant Owner -->
-    <br>
+    <!-- Overview Cards -->
+    <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+        <div style="background: #0b3b0d; color: white; padding: 18px 32px; border-radius: 10px; min-width: 220px;">
+            <div style="font-size: 18px;">Total Solar Plants</div>
+            <div style="font-size: 32px; font-weight: bold;">{{ total_plants }}</div>
+        </div>
+        <div style="background: #1a73e8; color: white; padding: 18px 32px; border-radius: 10px; min-width: 220px;">
+            <div style="font-size: 18px;">Analyzed Plants</div>
+            <div style="font-size: 32px; font-weight: bold;">{{ analyzed_plants }}</div>
+        </div>
+    </div>
+    <form method="get" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <input type="text" name="plant_name" placeholder="Solar Plant Name" value="{{ request.GET.plant_name|default:'' }}" style="padding: 6px; width: 180px;">
+        <input type="text" name="zone_name" placeholder="Zone" value="{{ request.GET.zone_name|default:'' }}" style="padding: 6px; width: 120px;">
+        <input type="text" name="owner_name" placeholder="Owner Username" value="{{ request.GET.owner_name|default:'' }}" style="padding: 6px; width: 140px;">
+        <button type="submit" style="padding: 6px 14px; background: #0b3b0d; color: white; border: none; border-radius: 4px;">Filter</button>
+    </form>
+    <h2>Solar Plants Overview</h2>
+    <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
+        <thead style="background:#0b3b0d; color:white;">
+            <tr>
+                <th>Solar Plant Name</th>
+                <th>Zone</th>
+                <th>Owner</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plant in plants %}
+                {% for zone in plant.zones.all %}
+                    <tr>
+                        <td>{{ plant.name }}</td>
+                        <td>{{ zone.name }}</td>
+                        <td>{{ plant.owner.username }}</td>
+                        <td>
+                            {# แสดง status ล่าสุดของ inspection ใน zone นี้ #}
+                            {% with inspections=zone.droneinspection_set.all|dictsortreversed:"captured_at" %}
+                                {% if inspections %}
+                                    {{ inspections.0.get_status_display }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <a href="{% url 'plant_detail_analyst' plant.id %}" style="background:#1a73e8; color:white; padding:6px 14px; border-radius:5px; text-decoration:none;">View</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td>{{ plant.name }}</td>
+                        <td>-</td>
+                        <td>{{ plant.owner.username }}</td>
+                        <td>-</td>
+                        <td>
+                            <a href="{% url 'plant_detail_analyst' plant.id %}" style="background:#1a73e8; color:white; padding:6px 14px; border-radius:5px; text-decoration:none;">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% empty %}
+                <tr><td colspan="5">No data available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
