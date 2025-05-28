@@ -1,0 +1,50 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}{{ plant.name }} - Detail{% endblock %}
+
+{% block content %}
+  <h2>{{ plant.name }} - Detail</h2>
+  <p><b>Location:</b> {{ plant.location }}</p>
+  <p><b>Owner:</b> {{ plant.owner.username }}</p>
+  <p><b>Data Analyst:</b> {{ plant.data_analyst.username }}</p>
+  <p><b>Drone Controller:</b> {{ plant.drone_controller.username }}</p>
+  <hr>
+  <h3>Zones & Inspections</h3>
+  {% for zone in zones %}
+    <div style="margin-bottom: 24px;">
+      <h4>Zone: {{ zone.name }}</h4>
+      <table border="1" cellpadding="8" cellspacing="0" style="width:100%; background:white; color:black;">
+        <thead style="background:#0b3b0d; color:white;">
+          <tr>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Analyzed by</th>
+            <th>Description</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for insp in zone.droneinspection_set.all|dictsortreversed:"captured_at" %}
+            <tr>
+              <td>{{ insp.captured_date }} {{ insp.captured_time }}</td>
+              <td>{{ insp.get_status_display }}</td>
+              <td>{% if insp.analyzed_by %}{{ insp.analyzed_by.username }}{% else %}-{% endif %}</td>
+              <td>{{ insp.description|default:"-" }}</td>
+              <td>
+                {% if insp.image %}
+                  <a href="{{ insp.image.url }}" target="_blank"><img src="{{ insp.image.url }}" style="height:60px;"></a>
+                {% else %}-{% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5">No inspection data.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+{% endblock %}

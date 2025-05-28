@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -88,7 +88,30 @@ def plant_owner_dashboard_view(request):
 
 @login_required
 def data_analyst_dashboard_view(request):
-    return render(request, 'dashboard/data_analyst_dashboard.html')
+    from plant.models import SolarPlant, Zone
+    from drone.models import DroneInspection
+    plants = SolarPlant.objects.all().prefetch_related('zones', 'owner')
+    plant_name = request.GET.get('plant_name', '').strip()
+    zone_name = request.GET.get('zone_name', '').strip()
+    owner_name = request.GET.get('owner_name', '').strip()
+
+    if plant_name:
+        plants = plants.filter(name__icontains=plant_name)
+    if owner_name:
+        plants = plants.filter(owner__username__icontains=owner_name)
+    if zone_name:
+        plants = plants.filter(zones__name__icontains=zone_name).distinct()
+
+    # Overview card context
+    total_plants = SolarPlant.objects.count()
+    analyzed_plant_ids = DroneInspection.objects.exclude(status='pending').values_list('plant_id', flat=True).distinct()
+    analyzed_plants = SolarPlant.objects.filter(id__in=analyzed_plant_ids).count()
+
+    return render(request, 'dashboard/data_analyst_dashboard.html', {
+        'plants': plants,
+        'total_plants': total_plants,
+        'analyzed_plants': analyzed_plants,
+    })
 
 @login_required
 def drone_controller_dashboard_view(request):
@@ -99,3 +122,13 @@ def drone_controller_dashboard_view(request):
 @login_required
 def site_admin_dashboard_view(request):
     return render(request, 'dashboard/site_admin_dashboard.html')
+
+@login_required
+def plant_detail_analyst_view(request, plant_id):
+    from plant.models import SolarPlant
+    plant = get_object_or_404(SolarPlant, id=plant_id)
+    zones = plant.zones.prefetch_related('droneinspection_set')
+    return render(request, 'dashboard/plant_detail_analyst.html', {
+        'plant': plant,
+        'zones': zones,
+    })
