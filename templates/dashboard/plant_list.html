@@ -19,6 +19,7 @@
         <th>กำลังการผลิต</th>
         <th>Data Analyst</th>
         <th>Drone Controller</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -29,6 +30,9 @@
           <td>{{ plant.installed_capacity_kw }} kW</td>
           <td>{{ plant.data_analyst.username }}</td>
           <td>{{ plant.drone_controller.username }}</td>
+          <td style="text-align: center; vertical-align: middle;">
+            <a href="{% url 'delete_plant' plant.pk %}" class="btn-red">Delete</a>
+          </td>
         </tr>
       {% endfor %}
     </tbody>

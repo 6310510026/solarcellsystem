@@ -1,0 +1,20 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Delete Solar Plant{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+    <h1 style="text-align: center; color:#0b3b0d">Are you sure you want to delete "{{ plant.name }}"?</h1>
+    <form method="post" style="text-align: center; padding: 20px;">
+        <h2>This action cannot be undone.</h2>
+        {% csrf_token %}
+        <button type="submit" class="btn-red">Confirm</button>
+    </form>
+    <div class ="button-group">
+        <a href="{% url 'plant_list' %}" class="btn-outline">Back</a>
+    </div>
+{% endblock %}

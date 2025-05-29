@@ -26,3 +26,12 @@ def plant_list_view(request):
     plants = SolarPlant.objects.filter(owner=request.user)
     return render(request, 'dashboard/plant_list.html', {'plants': plants})
 
+@login_required
+def delete_plant(request, pk):
+    plant = get_object_or_404(SolarPlant, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        plant.delete()
+        messages.success(request, 'Plant deleted successfully.')
+        return redirect('plant_list')
+    return render(request, 'dashboard/delete_plant.html', {'plant': plant})
+
