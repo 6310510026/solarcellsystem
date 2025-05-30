@@ -1,35 +1,48 @@
 {% extends 'dash.html' %}
 {% load static %}
+
 {% block style %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
-{% block title %}My Solar Plants{% endblock %}
-{% block class_name %}upload-form-container{% endblock %}
-
+{% block title %}{{ plant.name }} - Details{% endblock %}
 {% block content %}
-  <h2 class="upload-title">Solar Plant Details</h2>
-  <br>
-  {% if plants %}
-    <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
-      <thead style="background:#0b3b0d; color:white;">
-        <tr>
-          <th>ชื่อโรงไฟฟ้า</th>
-          <th>ที่ตั้ง</th>
-          <th>กำลังการผลิต</th>
-          <th>Data Analyst</th>
-          <th>Drone Controller</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for plant in plants %}
-          <tr>
-            <td>{{ plant.name }}</td>
-            <td>{{ plant.location }}</td>
-            <td>{{ plant.installed_capacity_kw }} kW</td>
-            <td>{{ plant.data_analyst.username }}</td>
-            <td>{{ plant.drone_controller.username }}</td>
-            <td style="text-align: center; vertical-align: middle;">
-              <a href="{% url 'delete_plant' plant.pk %}" class="btn-red">Delete</a>
-              <a href="{% url 'edit_plant' pk=plant.pk %}" class="btn-blue">Edit</a>{% endblock %}
+<h1 style="color: #0b3b0d; margin: auto;">Plant Name: {{ plant.name }}</h1>
+<div style="text-align: left; margin: 20px 0; color:#0b3b0d">
+<h3><strong>Plant ID:</strong> {{ plant.id }}</h3>
+<h3><strong>Coordinate:</strong> {{ plant.latitude|floatformat:3 }}, {{ plant.longitude|floatformat:3 }}</h3>
+<h3><strong>Created By:</strong> {{ plant.owner }}</h3>
+<h3><strong>Location:</strong> {{ plant.location }}</h3>
+<h3><strong>Capacity:</strong> {{ plant.installed_capacity_kw }} kW</h3>
+<h3><strong>Data Analyst:</strong> {{ plant.data_analyst.username }}</h3>
+<h3><strong>Drone Controller:</strong> {{ plant.drone_controller.username }}</h3>
+<h3><strong>Description:</strong> {{ plant.description|default:"-" }}</h3>
+<h3><strong>Created At:</strong> {{ plant.created_at|date:"Y-m-d H:i:s" }}</h3>
+<div class="button-group"></div>
+<a href ="{% url 'edit_plant' pk=plant.id %}" class="btn-yellow">Edit</a>
+<a href="{% url 'plant_list' %}" class="btn-outline">Back</a>
+</div>
+
+<hr>
+{% for zone in zones %}
+<h3>Zone: {{ zone.name }}</h3>
+<div class="zone-details">
+    {% for row in zone.rows.all %}
+    <div class="row-details">
+        <h4>Row {{ row.row_number }}</h4>
+        <div class="panel-grid">
+            {% for panel in row.panels.all %}
+            <div class="panel-item {% if panel.is_active %}active{% else %}inactive{% endif %}">
+                R{{ row.row_number }}C{{ panel.column_number }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+{% endfor %}
+{% endblock %}
+
+
+>>>>>>> 3fa07751c4c61caba37fb7ea62caebd3e890e653

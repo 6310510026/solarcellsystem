@@ -455,6 +455,16 @@ body.dash::before {
   text-decoration: underline;
   color: #146314;
 }
+
+.btn-yellow {
+  text-decoration: none;
+  padding: 10px 25px;
+  border-radius: 25px;
+  background: #e2bc15;
+  color: #0b3b0d;
+  border: none;
+  cursor: pointer;
+}
 /* === Table ของ Plant Owner === */
 tr.plant-wide td{
     text-align: center;
