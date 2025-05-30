@@ -1,0 +1,42 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Power Plant Report{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+<h2 class="upload-title">Your Power Plant Report</h2>
+<br>
+
+<table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
+    <thead style="background:#0b3b0d; color:white;">
+        <tr>
+            <th>ชื่อโรงไฟฟ้า</th>
+            <th>ที่ตั้ง</th>
+            <th>สถานะรายงาน</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in plant_reports %}
+        <tr class = "plant-wide">
+            <td>{{ item.plant.name }}</td>
+            <td>{{ item.plant.location }}</td>
+            <td>
+                {% if item.report_ready %}
+                    <a href="{% url 'view_report' item.report.id %}" class="btn-cyan">อ่านรายงาน</a>
+                {% else %}
+                    <button class="btn-blue" disabled>รอการวิเคราะห์</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">ไม่มีโรงไฟฟ้าในระบบ</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
