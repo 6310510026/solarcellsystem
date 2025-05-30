@@ -1,11 +1,16 @@
 # drone/views.py
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import DroneInspection
-from plant.models import SolarPlant
+from .models import DroneInspection, Notification
+from plant.models import SolarPlant, Zone
 from .forms import DroneInspectionForm # คุณต้องมี forms.py และ DroneInspectionForm ที่ถูกต้อง
 from django.conf import settings # ถ้าคุณใช้ settings เช่น settings.AUTH_USER_MODEL โดยตรง
+from datetime import date
+from django.utils.timezone import make_aware
+from django.db import models
+
 # from django.utils import timezone # ไม่จำเป็นใน view นี้ถ้า model ไม่ได้ใช้ timezone ใน save() พิเศษ
 
 
@@ -21,7 +26,8 @@ def upload_inspection(request):
         return redirect('no_permission') # ตรวจสอบว่ามี URL name 'no_permission'
 
     if request.method == 'POST':
-        form = DroneInspectionForm(request.POST, request.FILES)
+        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user)  # ✅ ลบ instance ออก
+
         if form.is_valid():
             inspection = form.save(commit=False)
             inspection.captured_by = request.user
@@ -31,67 +37,68 @@ def upload_inspection(request):
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = DroneInspectionForm()
+        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user)
 
     return render(request, 'dashboard/upload_inspection.html', {'form': form})
 
 @login_required
 def drone_status_view(request):
     if not hasattr(request.user, 'role') or request.user.role != 'drone_controller':
-        # messages.error(request, "You do not have permission to view this page.") # Optional message
         return redirect('no_permission')
 
-    # การเรียงลำดับใน status view:
-    # ถ้าต้องการเรียงตามเวลาที่ผู้ใช้ป้อน จะซับซ้อนกว่าเพราะเป็นสองฟิลด์
-    # ปัจจุบันเรียงตาม captured_at (เวลาที่ระบบบันทึก) ซึ่งก็สมเหตุสมผลสำหรับการดูรายการล่าสุด
-    inspections = DroneInspection.objects.filter(captured_by=request.user).order_by('-captured_at')
-    return render(request, 'dashboard/status.html', {'inspections': inspections})
+    today = date.today()
 
-@login_required # เพิ่ม @login_required ถ้ายังไม่มี
+    inspections = DroneInspection.objects.filter(
+        captured_by=request.user
+    ).filter(
+        models.Q(status='pending') |
+        models.Q(status='issue_found') |
+        (models.Q(status='analyzed') & models.Q(captured_date=today))
+    ).select_related('analyzed_by').order_by('-captured_date', '-captured_time')
+
+
+    return render(request, 'dashboard/status.html', {
+        'inspections': inspections,
+    })
+
+
+@login_required
 def edit_inspection(request, inspection_id):
     inspection = get_object_or_404(DroneInspection, pk=inspection_id)
 
-    # Permission check (ตัวอย่าง - ปรับตาม logic ของคุณ)
+    # Permission check
     can_edit = False
     if request.user == inspection.captured_by:
         can_edit = True
-    # ตรวจสอบว่า User model ของคุณมี attribute 'role' จริงหรือไม่
     elif hasattr(request.user, 'role') and request.user.role == 'admin':
         can_edit = True
-    
+
     if not can_edit:
         messages.error(request, "You do not have permission to edit this inspection.")
         return redirect('drone_status')
 
     if request.method == 'POST':
-        print("Request POST data:", request.POST) # DEBUG: ดูข้อมูลที่ส่งมาจากฟอร์ม
-        form = DroneInspectionForm(request.POST, request.FILES, instance=inspection)
+        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user, instance=inspection)
         if form.is_valid():
-            print("Form is valid. Attempting to save...") # DEBUG
             try:
-                updated_inspection = form.save() # เรียก form.save() ซึ่งจะเรียก model.save()
+                updated_inspection = form.save(commit=False)
+                updated_inspection.status = 'pending'  # ✅ เปลี่ยนสถานะกลับเป็น pending
+                updated_inspection.save()
 
-                # Debugging prints ที่ตรงกับฟิลด์ปัจจุบัน
-                print(f"Cleaned data date: {form.cleaned_data.get('captured_date')}") # DEBUG
-                print(f"Cleaned data time: {form.cleaned_data.get('captured_time')}") # DEBUG
-                print(f"Inspection (ID: {updated_inspection.pk}) saved.") # DEBUG
-                # แสดงค่า captured_date และ captured_time ที่บันทึกแล้ว
-                print(f"Saved captured_date: {updated_inspection.captured_date}") # DEBUG
-                print(f"Saved captured_time: {updated_inspection.captured_time}") # DEBUG
-
-                messages.success(request, "Inspection details updated successfully.")
+                messages.success(request, "Inspection details updated successfully and set to pending.")
                 return redirect('drone_status')
             except Exception as e:
-                print(f"An error occurred during save: {e}") # DEBUG
                 messages.error(request, f"An error occurred while saving the inspection: {str(e)}")
-        else: 
-            print("Form is NOT valid.") # DEBUG
-            print(form.errors) # DEBUG: แสดงว่า error จากฟอร์มคืออะไร
+        else:
             messages.error(request, "Please correct the errors shown below.")
-    else: # GET request
-        form = DroneInspectionForm(instance=inspection)
+    else:
+        form = DroneInspectionForm(user=request.user)
 
-    return render(request, 'dashboard/edit_inspection.html', {'form': form, 'inspection': inspection})
+    return render(request, 'dashboard/edit_inspection.html', {
+        'form': form,
+        'inspection': inspection
+    })
+
 
 @login_required
 def plant_detail_view(request, plant_id):
@@ -103,6 +110,49 @@ def plant_detail_view(request, plant_id):
         'plant': plant,
         'zones': zones,
     })
+
+def ajax_get_zones_by_plant(request, plant_id):
+    zones = Zone.objects.filter(plant_id=plant_id).values('id', 'name')
+    return JsonResponse(list(zones), safe=False)
+
+
+@login_required
+def drone_task_view(request):
+    today = date.today()
+    plants = SolarPlant.objects.filter(drone_controller=request.user).prefetch_related('zones')
+    tasks = []
+
+    for plant in plants:
+        for zone in plant.zones.all():
+            # ตรวจว่ามี inspection ที่อัปโหลดวันนี้แล้วหรือยัง
+            uploaded = DroneInspection.objects.filter(
+                plant=plant,
+                zone=zone,
+                captured_date=today,
+                captured_by=request.user
+            ).exists()
+
+            tasks.append({
+                'plant': plant,
+                'zone': zone,
+                'uploaded': uploaded,
+            })
+
+    return render(request, 'dashboard/drone_tasks.html', {
+        'today': today,
+        'tasks': tasks,
+    })
+
+@login_required
+def notification_view(request):
+    if not hasattr(request.user, 'role') or request.user.role != 'drone_controller':
+        return redirect('no_permission')
+
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'dashboard/notifications.html', {
+        'notifications': notifications,
+    })
+
 
 @login_required
 def data_analyst_dashboard(request):

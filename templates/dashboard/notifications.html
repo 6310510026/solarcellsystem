@@ -1,0 +1,25 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block title %}Notifications{% endblock %}
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+<h2>Notifications</h2>
+<ul>
+  {% for note in notifications %}
+    <li style="margin-bottom: 15px; background: white; padding: 10px; color: black; border-left: 5px solid #0b3b0d;">
+      <strong>[{{ note.get_type_display }}]</strong>
+      <p>{{ note.message }}</p>
+      {% if note.link %}
+        <a href="{{ note.link }}" class="btn-outline">View</a>
+      {% endif %}
+      <small>{{ note.created_at|date:"d M Y H:i" }}</small>
+    </li>
+  {% empty %}
+    <p>No notifications yet.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

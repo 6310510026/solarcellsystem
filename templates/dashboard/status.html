@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}Drone Upload Status{% endblock %}
 
-
+{% block class_name %}upload-form-container{% endblock %}
 {% block content %}
 <h2 style="text-align: left;">Status Update</h2>
 <br>
@@ -77,5 +77,4 @@
   </tbody>
 </table>
 <br>
-<a href="{% url 'upload_inspection' %}" class="btn-green">Upload New Inspection</a>
 {% endblock %}

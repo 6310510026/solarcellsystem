@@ -36,3 +36,18 @@ class DroneInspection(models.Model):
         return f"Inspection {self.pk} @ {self.zone.name} - {self.get_status_display()}"
 
 
+
+# drone/models.py
+
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    link = models.URLField(blank=True, null=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=50, choices=[
+        ('task_status', 'Task Status Changed'),
+        ('new_plant', 'New Plant Assigned'),
+        ('new_zone', 'New Zone Added'),
+        ('new_panel', 'New Panel Added'),
+    ])
