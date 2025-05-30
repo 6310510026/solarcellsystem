@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from .models import CustomUser
 
 User = get_user_model()
 
@@ -32,7 +33,7 @@ def register_user(request):
         user.is_active = False  # 🔴 ปิดการใช้งานจนกว่า admin จะอนุมัติ
         user.save()
 
-        messages.success(request, "ลงทะเบียนสำเร็จ! โปรดรอผู้ดูแลระบบอนุมัติบัญชีก่อนเข้าใช้งาน")
+        messages.success(request, "Registration successful. Await admin approval.")
         return redirect('login_page')
     return render(request, 'register.html')
 
@@ -132,3 +133,39 @@ def plant_detail_analyst_view(request, plant_id):
         'plant': plant,
         'zones': zones,
     })
+
+
+
+@login_required
+def complete_profile(request):
+    user = request.user
+
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        if role in ['plant_owner', 'data_analyst', 'drone_controller']:
+            user.role = role
+            user.is_active = False  # deactivate จนกว่า admin จะอนุมัติ
+            user.save()
+            messages.success(request, "Registration successful. Await admin approval.")
+            return redirect('login_page')  # แจ้งให้รอ approval
+    return render(request, 'select_role.html')
+
+@login_required
+def complete_profile(request):
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if password1 != password2:
+            messages.error(request, "Passwords do not match.")
+        else:
+            user = request.user
+            user.role = role
+            user.set_password(password1)
+            user.is_active = False  # ต้องให้ admin อนุมัติ
+            user.save()
+            messages.success(request, "Profile updated. Waiting for admin approval.")
+            return redirect('login_page')
+
+    return render(request, 'select_role.html')

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'social_django',
     
 
     # ✅ แอปที่สร้างเอง
@@ -83,6 +84,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -152,13 +155,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend', # Allauth backend
+    'social_core.backends.google.GoogleOAuth2',
 )
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id':'',
-            'secret': '',
+            'client_id':'907102278294-jutera6819h1535gcopg0selnoqn3prl.apps.googleusercontent.com',
+            'secret': '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',
           
         },
         'SCOPE': ['profile','email',],
@@ -184,3 +188,9 @@ CSRF_TRUSTED_ORIGINS = [
     # ใส่ domain อื่นๆ ที่เชื่อถือได้ที่นี่
     
 ]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '907102278294-jutera6819h1535gcopg0selnoqn3prl.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+# settings.py
+LOGIN_REDIRECT_URL = '/accounts/complete-profile/'
