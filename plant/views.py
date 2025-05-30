@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from decimal import Decimal
 from drone.models import DroneInspection
 from .forms import SolarPlantForm, ZoneForm, PanelRowForm, SolarPanelForm
-from .models import SolarPlant, Zone, PanelRow, SolarPanel
+from .models import SolarPlant, Zone, PanelRow, SolarPanel, InspectionReport
 
 
 # Create your views here.
@@ -125,4 +125,33 @@ def plant_detail_view(request, pk):
         'columns_range': range(1, max_columns + 1),
     }
     return render(request, 'dashboard/plant_detail_solar.html', context)
+
+@login_required
+def plant_report_view(request):
+    plants = SolarPlant.objects.filter(owner=request.user)
+    plant_reports = []
+
+    for plant in plants:
+        report = InspectionReport.objects.filter(plant=plant, is_analyzed=True).last()
+        plant_reports.append({
+            'plant': plant,
+            'report_ready': report is not None,
+            'report': report
+        })
+
+    context = {'plant_reports': plant_reports}
+    return render(request, 'dashboard/plant_report.html', context)
+
+@login_required
+def view_report(request, report_id):
+    report = get_object_or_404(InspectionReport, id=report_id)
+    context = {
+        'report': report,
+        'pie_data': {
+            'labels': ['Red Zone', 'Yellow Zone', 'Green Zone'],
+            'values': [report.redzone, report.yellowzone, report.greenzone]
+        }
+    }
+    return render(request, 'dashboard/view_report.html', context)
+
 

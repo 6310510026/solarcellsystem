@@ -1,0 +1,77 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4" style="color:#0b3b0d">รายงานการตรวจสอบโรงไฟฟ้า</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title" style="color:#0b3b0d;">{{ report.plant.name }}</h1>
+            <h2 class="card-text"><strong>วันที่ตรวจสอบ:</strong> {{ report.report_date }}</h2>
+            <h2 class="card-text"><strong>ผู้วิเคราะห์:</strong> {{ report.plant.data_analyst }}</h2>
+            <hr>
+            <p class="card-text"><strong>สรุปรายงาน:</strong></p>
+            <p class="card-text">{{ report.analysis_details|linebreaks }}</p>
+            <div class="button-group">
+                <a href="{% url 'plant_report' %}" class="btn-outline">← กลับไปหน้ารายงานทั้งหมด</a>
+            </div>
+            <h1 style="color:#0b3b0d">ประสิทธิภาพของแผง Solar Cell</h3>
+
+            {{ pie_data.labels|json_script:"pieLabels" }}
+            {{ pie_data.values|json_script:"pieValues" }}
+
+            <!-- แสดงกราฟ -->
+            <canvas id="zonePieChart" style="max-width: 450px; max-height: 450px;  justify-content: center;"></canvas>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ดึงข้อมูล JSON จาก script tag ที่สร้างโดย json_script
+    const labels = JSON.parse(document.getElementById('pieLabels').textContent);
+    const values = JSON.parse(document.getElementById('pieValues').textContent);
+
+    console.log('Labels:', labels);
+    console.log('Values:', values);
+
+    const ctx = document.getElementById('zonePieChart').getContext('2d');
+    const zonePieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Zone Ratio',
+                data: values,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',  // Red Zone
+                    'rgba(255, 205, 86, 0.7)',  // Yellow Zone
+                    'rgba(75, 192, 192, 0.7)'   // Green Zone
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+
+

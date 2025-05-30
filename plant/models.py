@@ -82,3 +82,16 @@ class SolarPanel(models.Model):
 
     def __str__(self):
         return f"Panel R{self.row.row_number}-C{self.column_number} ({self.row.zone.name} / {self.row.zone.plant.name})"
+    
+# 5. รายงานการตรวจสอบ
+class InspectionReport(models.Model):
+    plant = models.ForeignKey(SolarPlant, on_delete=models.CASCADE, related_name='inspection_reports')
+    report_date = models.DateField(verbose_name="วันที่รายงาน")
+    is_analyzed = models.BooleanField(default=False, verbose_name="วิเคราะห์แล้ว")
+    analysis_details = models.TextField(blank=True, verbose_name="รายละเอียดการวิเคราะห์")
+    redzone = models.FloatField(default=0)     
+    yellowzone = models.FloatField(default=0)   # zone จะรวมกันไม่เกิน 100%
+    greenzone = models.FloatField(default=0)
+
+    def __str__(self):
+        return f"Report for {self.plant.name} on {self.report_date}"
