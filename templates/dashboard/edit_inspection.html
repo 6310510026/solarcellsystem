@@ -116,4 +116,41 @@
     });
   });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const plantSelect = document.getElementById("id_plant");
+  const zoneSelect = document.getElementById("id_zone");
+
+  if (plantSelect && zoneSelect) {
+    plantSelect.addEventListener("change", function () {
+      const plantId = this.value;
+
+      fetch(`/drone/ajax/zones/${plantId}/`)
+        .then(response => {
+          if (!response.ok) throw new Error("Network error");
+          return response.json();
+        })
+        .then(data => {
+          // เคลียร์ตัวเลือกเก่า
+          zoneSelect.innerHTML = '';
+          // เพิ่ม default option
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.text = "---------";
+          zoneSelect.appendChild(defaultOption);
+          // ใส่ zone ที่ได้จาก ajax
+          data.forEach(zone => {
+            const option = document.createElement("option");
+            option.value = zone.id;
+            option.text = zone.name;
+            zoneSelect.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching zones:", error);
+        });
+    });
+  }
+});
+</script>
 {% endblock %}

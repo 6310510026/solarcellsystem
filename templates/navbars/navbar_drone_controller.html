@@ -1,6 +1,29 @@
 <ul class="menu">
-    <li><a href="{% url 'drone_controller_dashboard' %}" class="green-link">Overview</a></li>
-    <li><a href="{% url 'drone_status' %}">Status</a></li>
-    <li><a href="#">Management</a></li>
-    <li><a href="{% url 'logout_page' %}" class="green-link">Logout</a></li>
+    <li>
+        <a href="{% url 'drone_controller_dashboard' %}" 
+           class="green-link {% if request.resolver_match.url_name == 'drone_controller_dashboard' %}active{% endif %}">
+            Overview
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'drone_status' %}" 
+           class="{% if request.resolver_match.url_name == 'drone_status' %}active{% endif %}">
+            Status
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'drone_tasks' %}" class="{% if request.resolver_match.url_name == 'drone_tasks' %}active{% endif %}">
+            Task
+        </a>
+    </li>
+        <li>
+        <a href="{% url 'notifications' %}" class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+            Notification
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'logout_page' %}" class="green-link">
+            Logout
+        </a>
+    </li>
 </ul>

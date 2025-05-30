@@ -1,0 +1,44 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block title %}Drone Tasks{% endblock %}
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+<h2 style="text-align: left;">Tasks for {{ today }}</h2>
+<br>
+<table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
+  <thead style="background:#0b3b0d; color:white;">
+    <tr>
+      <th>Solar Plant</th>
+      <th>Zone</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+      <tr>
+        <td>{{ task.plant.name }}</td>
+        <td>{{ task.zone.name }}</td>
+        <td>
+          {% if task.uploaded %}
+            <span style="color: green;">✅ Uploaded</span>
+          {% else %}
+            <span style="color: red;">❌ Not Uploaded</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if not task.uploaded %}
+            <a href="{% url 'upload_inspection' %}?plant_id={{ task.plant.id }}&zone_id={{ task.zone.id }}" class="plant-link">Upload</a>
+          {% else %}
+            <span style="color: gray;">Done</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

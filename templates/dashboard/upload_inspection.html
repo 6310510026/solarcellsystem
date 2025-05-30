@@ -42,7 +42,7 @@
 
 <div class="button-group">
   <button type="submit" form="upload_form" class="btn-green">Save</button>
-  <a href="{% url 'drone_status' %}" class="btn-outline">Back</a>
+  <a href="{% url 'drone_tasks' %}" class="btn-outline">Back</a>
 </div>
 
 <script>
@@ -55,6 +55,24 @@
     if (e.target.files.length > 0) {
       reader.readAsDataURL(e.target.files[0]);
     }
+  });
+</script>
+<script>
+  document.getElementById("id_plant").addEventListener("change", function () {
+    const plantId = this.value;
+    const zoneSelect = document.getElementById("id_zone");
+
+    fetch(`/drone/ajax/zones/${plantId}/`)  // ✅ ตรวจเส้นทางว่าเริ่มด้วย /drone/ เพราะ path อยู่ใน drone app
+      .then(response => response.json())
+      .then(data => {
+        zoneSelect.innerHTML = '';
+        data.forEach(zone => {
+          const option = document.createElement("option");
+          option.value = zone.id;
+          option.textContent = zone.name;
+          zoneSelect.appendChild(option);
+        });
+      });
   });
 </script>
 {% endblock %}

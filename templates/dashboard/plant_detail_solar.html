@@ -32,4 +32,4 @@
             <td>{{ plant.drone_controller.username }}</td>
             <td style="text-align: center; vertical-align: middle;">
               <a href="{% url 'delete_plant' plant.pk %}" class="btn-red">Delete</a>
-              <a href="{% url 'edit_plant' pk=plant.pk %}" class="btn-blue">Edit</a>
+              <a href="{% url 'edit_plant' pk=plant.pk %}" class="btn-blue">Edit</a>{% endblock %}

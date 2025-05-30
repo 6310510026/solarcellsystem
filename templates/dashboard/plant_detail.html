@@ -6,20 +6,24 @@
 
 {% block title %}{{ plant.name }} Details{% endblock %}
 
+{% block class_name %}upload-form-container{% endblock %}
+
 {% block content %}
-  <h2>{{ plant.name }} - Detail</h2>
+  <h2>Plant Name: {{ plant.name }}</h2>
   <p>Location: {{ plant.location }}</p>
 
   {% for zone in zones %}
-    <h3>Zone: {{ zone.name }}</h3>
+    <h3 style="color: #0b3b0d;">Zone: {{ zone.name }}</h3>
     {% for row in zone.rows.all %}
       <div style="display: flex; gap: 10px; margin-bottom: 10px;">
         {% for panel in row.panels.all %}
-          <div style="width: 80px; height: 80px; border: 1px solid #0b3b0d; background-color: {% if panel.is_active %}#cce5cc{% else %}#f8d7da{% endif %}; text-align: center; line-height: 80px;">
+          <div style="width: 80px; height: 80px; border: 1px solid #0b3b0d; color: #0b3b0d; background-color: {% if panel.is_active %}#cce5cc{% else %}#f8d7da{% endif %}; text-align: center; line-height: 80px;">
             R{{ row.row_number }}C{{ panel.column_number }}
           </div>
         {% endfor %}
       </div>
     {% endfor %}
   {% endfor %}
+  <br>
+  <div><a href="{% url 'drone_controller_dashboard' %}" class="btn-outline">Back</a></div>
 {% endblock %}
