@@ -1,0 +1,35 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}My Solar Plants{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+  <h2 class="upload-title">Solar Plant Details</h2>
+  <br>
+  {% if plants %}
+    <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; color:black;">
+      <thead style="background:#0b3b0d; color:white;">
+        <tr>
+          <th>ชื่อโรงไฟฟ้า</th>
+          <th>ที่ตั้ง</th>
+          <th>กำลังการผลิต</th>
+          <th>Data Analyst</th>
+          <th>Drone Controller</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for plant in plants %}
+          <tr>
+            <td>{{ plant.name }}</td>
+            <td>{{ plant.location }}</td>
+            <td>{{ plant.installed_capacity_kw }} kW</td>
+            <td>{{ plant.data_analyst.username }}</td>
+            <td>{{ plant.drone_controller.username }}</td>
+            <td style="text-align: center; vertical-align: middle;">
+              <a href="{% url 'delete_plant' plant.pk %}" class="btn-red">Delete</a>
+              <a href="{% url 'edit_plant' pk=plant.pk %}" class="btn-blue">Edit</a>

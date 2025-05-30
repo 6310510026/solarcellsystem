@@ -1,25 +1,31 @@
 {% extends 'dash.html' %}
 {% load static %}
 
-{% block style %}
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-{% endblock %}
-
 {% block title %}Create Solar Plant{% endblock %}
 {% block class_name %}upload-form-container{% endblock %}
 
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
 {% block content %}
-  <h2 class="upload-title">Create Solar Plant</h2>
-  <br>
-  <form method="post" class="upload-grid-form" id="plant_form">
+<h2 class="upload-title">Create Solar Plant</h2>
+<br>
+<form method="post" class="upload-grid-form" id="plant_form">
     {% csrf_token %}
     <div class="form-fields">
         <label for="id_name">Plant Name:</label>
         {{ form.name }}
 
-        <label for="id_location">Location:</label>
-        {{ form.location }}
+        <label for="id_latitude">Choose your location:</label>
+        <div id="map" style="height: 400px; margin-bottom: 10px;"></div>
+        <label for="id_latitude">Latitude:</label>
+        {{ form.latitude }}
+        <label for="id_longitude">Longitude:</label>
+        {{ form.longitude }}
 
+        <label for="location">Location:</label>
+        {{ form.location }}
         <label for="id_installed_capacity_kw">Installed Capacity (kW):</label>
         {{ form.installed_capacity_kw }}
 
@@ -32,10 +38,51 @@
         <label for="id_drone_controller">Drone Controller:</label>
         {{ form.drone_controller }}
     </div>
-  </form>
+</form>
 
-  <div class="button-group">
-    <button type="submit" form="plant_form" class="btn-green">Save</button>
-      <a href="{% url 'plant_list' %}" class="btn-outline">Back</a>
-  </div>
+<div class="button-group">
+  <button type="submit" form="plant_form" class="btn-green">Create Zone</button>
+  <a href="{% url 'plant_list' %}" class="btn-outline">Back</a>
+</div>
 {% endblock %}
+
+{% block script %}
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhpWrTFN7ktf3CMxA8ANz-3T3JfswhvaA&callback=initMap"
+  async defer></script>
+
+<script>
+function initMap() {
+  const initialPosition = { lat: 13.7563, lng: 100.5018 }; // Bangkok
+
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 6,
+    center: initialPosition,
+  });
+
+  let marker = new google.maps.Marker({
+    position: initialPosition,
+    map: map,
+    draggable: true
+  });
+
+  document.getElementById('id_latitude').value = initialPosition.lat;
+  document.getElementById('id_longitude').value = initialPosition.lng;
+
+  marker.addListener("dragend", function(event) {
+    document.getElementById('id_latitude').value = event.latLng.lat();
+    document.getElementById('id_longitude').value = event.latLng.lng();
+  });
+
+  map.addListener("click", function(event) {
+    marker.setPosition(event.latLng);
+    document.getElementById('id_latitude').value = event.latLng.lat();
+    document.getElementById('id_longitude').value = event.latLng.lng();
+  });
+}
+</script>
+{% endblock %}
+
+
+
+

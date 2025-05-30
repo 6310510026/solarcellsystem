@@ -6,7 +6,9 @@ from django.conf import settings
 # 1. โรงไฟฟ้า
 class SolarPlant(models.Model):
     name = models.CharField(max_length=255, verbose_name="ชื่อโรงไฟฟ้า")
-    location = models.CharField(max_length=255, verbose_name="ที่ตั้ง")
+    location = models.CharField(max_length=255, verbose_name="ที่ตั้งโรงไฟฟ้า") 
+    latitude = models.FloatField(verbose_name="ละติจูด", null=True, blank=True)
+    longitude = models.FloatField(verbose_name="ลองจิจูด", null=True, blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

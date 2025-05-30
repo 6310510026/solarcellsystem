@@ -1,0 +1,23 @@
+{% extends 'dash.html' %}
+{% load static %}
+
+{% block title %}Create Zone{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+  <h2 class="upload-title">Create Zone</h2>
+  <form method="post" class="upload-grid-form" id="zone_form">
+    {% csrf_token %}
+    <div class="form-fields">
+      <label for="id_name">Zone Name:</label>
+      {{ form.name }}
+    </div>
+  </form>
+
+  <div class="button-group">
+    <button type="submit" form="zone_form" class="btn-green">Create Panel Row</button>
+    <a href="{% url 'create_plant' %}" class="btn-outline">Back</a>
+  </div>
+{% endblock %}
+
+

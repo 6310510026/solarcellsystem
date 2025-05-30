@@ -1,0 +1,22 @@
+{% extends 'dash.html' %}
+{% load static %}
+
+{% block title %}Create Panel Row{% endblock %}
+{% block class_name %}upload-form-container{% endblock %}
+
+{% block content %}
+  <h2 class="upload-title">Create Panel Row</h2>
+  <form method="post" class="upload-grid-form" id="panel_row_form">
+    {% csrf_token %}
+    <div class="form-fields">
+      <label for="id_row_number">Row Number:</label>
+      {{ form.row_number }}
+    </div>
+  </form>
+
+  <div class="button-group">
+    <button type="submit" form="panel_row_form" class="btn-green">Create Solar Panel</button>
+    <a href="{% url 'create_zone' plant_id=plant_id %}" class="btn-outline">Back</a>
+  </div>
+{% endblock %}
+

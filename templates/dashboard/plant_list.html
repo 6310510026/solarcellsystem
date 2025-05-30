@@ -24,14 +24,14 @@
     </thead>
     <tbody>
       {% for plant in plants %}
-        <tr>
-          <td>{{ plant.name }}</td>
+        <tr class = "plant-wide">
+          <td class="clickable"><a href="{% url 'plant_detail_solar' plant.pk %}">{{ plant.name }}</a></td>
           <td>{{ plant.location }}</td>
           <td>{{ plant.installed_capacity_kw }} kW</td>
           <td>{{ plant.data_analyst.username }}</td>
           <td>{{ plant.drone_controller.username }}</td>
           <td style="text-align: center; vertical-align: middle;">
-            <a href="{% url 'delete_plant' plant.pk %}" class="btn-red">Delete</a>
+            <a href="{% url 'delete_plant' plant.pk %}" class="btn-red">🗑️ Delete</a>
           </td>
         </tr>
       {% endfor %}
