@@ -1,18 +1,63 @@
 {% extends 'dash.html' %}
 {% load static %}
+
+{% block title %}Edit Solar Plant{% endblock %}
+
 {% block style %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
-{% block title %}My Solar Plants{% endblock %}
 {% block class_name %}upload-form-container{% endblock %}
 
 {% block content %}
   <h2>Edit Solar Plant</h2>
-  <form method="post">
+  <form method="post" class="upload-grid-form" id="plant_form">
     {% csrf_token %}
+    <div class="form-fields">
+    <div id="map" style="height: 400px; margin-bottom: 10px;"></div>
     {{ form.as_p }}
-    <button type="submit">Update</button>
+    </div>
   </form>
-  <a href="{% url 'plant_detail' pk=plant.pk %}">Cancel</a>
+  
+  <div class="button-group">    
+  <button type="submit" form="plant_form" class="btn-green">Update Plant</button>
+  <a href="{% url 'plant_detail_solar' plant.id %}" class="btn-outline">Cancel</a>
+  </div>
+{% endblock %}
+
+{% block script %}
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhpWrTFN7ktf3CMxA8ANz-3T3JfswhvaA&callback=initMap"
+  async defer></script>
+
+<script>
+function initMap() {
+  const initialPosition = { lat: 13.7563, lng: 100.5018 }; // Bangkok
+
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 6,
+    center: initialPosition,
+  });
+
+  let marker = new google.maps.Marker({
+    position: initialPosition,
+    map: map,
+    draggable: true
+  });
+
+  document.getElementById('id_latitude').value = initialPosition.lat;
+  document.getElementById('id_longitude').value = initialPosition.lng;
+
+  marker.addListener("dragend", function(event) {
+    document.getElementById('id_latitude').value = event.latLng.lat();
+    document.getElementById('id_longitude').value = event.latLng.lng();
+  });
+
+  map.addListener("click", function(event) {
+    marker.setPosition(event.latLng);
+    document.getElementById('id_latitude').value = event.latLng.lat();
+    document.getElementById('id_longitude').value = event.latLng.lng();
+  });
+}
+</script>
 {% endblock %}

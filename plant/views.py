@@ -102,13 +102,27 @@ def edit_plant(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Plant updated successfully.')
-            return redirect('plant_detail', pk=plant.pk)
+            return redirect('plant_detail_solar', pk=plant.id)
     else:
         form = SolarPlantForm(instance=plant, user=request.user)
     return render(request, 'dashboard/edit_plant.html', {'form': form, 'plant': plant})
 
 @login_required
 def plant_detail_view(request, pk):
-    plant = get_object_or_404(SolarPlant, pk=pk, owner=request.user)
-    inspections = DroneInspection.objects.filter(plant=plant)
-    return render(request, 'dashboard/plant_detail.html', {'plant': plant, 'inspections': inspections})
+    plant = get_object_or_404(SolarPlant, pk=pk)
+    panel_rows = PanelRow.objects.filter(zone__plant=plant).order_by('row_number')
+    panels_by_row = {}
+
+    max_columns = 0
+    for row in panel_rows:
+        panels = SolarPanel.objects.filter(row=row)
+        panels_by_row[row.row_number] = {panel.column_number: panel for panel in panels}
+        max_columns = max(max_columns, panels.count())
+
+    context = {
+        'plant': plant,
+        'panels_by_row': panels_by_row,
+        'columns_range': range(1, max_columns + 1),
+    }
+    return render(request, 'dashboard/plant_detail_solar.html', context)
+
