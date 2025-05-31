@@ -36,7 +36,7 @@ def register_user(request):
         user.is_active = False  # 🔴 ปิดการใช้งานจนกว่า admin จะอนุมัติ
         user.save()
 
-        messages.success(request, "ลงทะเบียนสำเร็จ! โปรดรอผู้ดูแลระบบอนุมัติบัญชีก่อนเข้าใช้งาน")
+        messages.success(request, "Registration successful. Await admin approval.")
         return redirect('login_page')
     return render(request, 'register.html')
 
@@ -186,3 +186,23 @@ def panel_analytics_view(request, plant_id):
         'installed_per_panel': installed_per_panel,
     }
     return render(request, 'dashboard/panel_analytics.html', context)
+
+@login_required
+def complete_profile(request):
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if password1 != password2:
+            messages.error(request, "Passwords do not match.")
+        else:
+            user = request.user
+            user.role = role
+            user.set_password(password1)
+            user.is_active = False  # ต้องให้ admin อนุมัติ
+            user.save()
+            messages.success(request, "Profile updated. Waiting for admin approval.")
+            return redirect('login_page')
+
+    return render(request, 'select_role.html')

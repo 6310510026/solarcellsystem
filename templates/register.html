@@ -34,7 +34,15 @@
         <button type="submit">Register</button>
     </form>
     <p>Already have an account? <a href="{% url 'login_page' %}">Login here</a></p>
+    <hr>
+    <div style="text-align: center; margin-top: 20px;">
+    <p>or register with</p>
+<a href="{% url 'social:begin' 'google-oauth2' %}" class="btn-google">
+    <img src="{% static 'images/google-logo.png' %}" alt="Google" style="height: 20px; vertical-align: middle;">
+    Register with Google
+</a>
 
+    </div>
     <!-- แสดงข้อความแจ้งเตือน -->
     {% if messages %}
     <ul class="messages">

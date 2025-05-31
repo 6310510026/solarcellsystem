@@ -26,6 +26,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),  # เพิ่มตรงนี้
     path('plant/', include('plant.urls')),
     path('drone/', include('drone.urls')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
 ]
 
 if settings.DEBUG:
