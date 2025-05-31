@@ -51,3 +51,6 @@ class Notification(models.Model):
         ('new_zone', 'New Zone Added'),
         ('new_panel', 'New Panel Added'),
     ])
+
+    def __str__(self):
+        return f"[{self.type}] {self.message[:30]}"

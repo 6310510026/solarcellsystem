@@ -20,26 +20,39 @@ from django.db import models
 # =============================
 @login_required
 def upload_inspection(request):
-    # ตรวจสอบว่า User model ของคุณมี attribute 'role' จริงหรือไม่
     if not hasattr(request.user, 'role') or request.user.role != 'drone_controller':
-        # messages.error(request, "You do not have permission to upload.") # Optional message
-        return redirect('no_permission') # ตรวจสอบว่ามี URL name 'no_permission'
+        return redirect('no_permission')
+
+    zone_id = request.GET.get('zone_id')
+    zone = Zone.objects.get(id=zone_id)
 
     if request.method == 'POST':
-        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user)  # ✅ ลบ instance ออก
-
+        form = DroneInspectionForm(request.POST, request.FILES)
         if form.is_valid():
             inspection = form.save(commit=False)
             inspection.captured_by = request.user
-            inspection.save() # นี่จะเรียก model's save()
-            messages.success(request, "อัปโหลดภาพเรียบร้อยแล้ว")
-            return redirect('drone_status') # ตรวจสอบว่ามี URL name 'drone_status'
-        else:
-            messages.error(request, "Please correct the errors below.")
-    else:
-        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user)
+            inspection.captured_date = date.today()
+            inspection.zone = zone
+            inspection.save()
 
-    return render(request, 'dashboard/upload_inspection.html', {'form': form})
+            # ✅ สร้าง Notification สำหรับ Drone Controller
+            Notification.objects.create(
+                user=request.user,
+                message=f"You have uploaded a new task for zone '{zone.name}' in plant '{zone.plant.name}'.",
+                type='task_status',
+                link='/drone/status/'
+            )
+            print("✅ Notification created")
+
+
+            return redirect('notifications')
+    else:
+        form = DroneInspectionForm()
+
+    return render(request, 'dashboard/upload_inspection.html', {
+        'form': form,
+        'zone': zone,
+    })
 
 @login_required
 def drone_status_view(request):
@@ -145,12 +158,9 @@ def drone_task_view(request):
 
 @login_required
 def notification_view(request):
-    if not hasattr(request.user, 'role') or request.user.role != 'drone_controller':
-        return redirect('no_permission')
-
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'dashboard/notifications.html', {
-        'notifications': notifications,
+        'notifications': notifications
     })
 
 
