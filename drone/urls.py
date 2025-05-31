@@ -10,5 +10,4 @@ urlpatterns = [
     path('plant/<int:plant_id>/', views.plant_detail_view, name='plant_detail'),
     path('ajax/zones/<int:plant_id>/', views.ajax_get_zones_by_plant, name='ajax_get_zones'),
     path('tasks/', views.drone_task_view, name='drone_tasks'),
-    path('notifications/', views.notification_view, name='notifications'),
 ]

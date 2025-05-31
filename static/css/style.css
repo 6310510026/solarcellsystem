@@ -35,13 +35,13 @@ body.dash {
     padding: 0;
     min-height: 100vh;
     font-family: 'Arial', sans-serif;
-    overflow: hidden;
 }
 
 /* ✅ background เบลออยู่ด้านหลัง */
 body.dash::before {
     content: '';
     position: fixed;
+    pointer-events: none;
     top: 0;
     left: 0;
     width: 100%;
