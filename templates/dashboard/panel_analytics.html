@@ -1,0 +1,47 @@
+{% extends 'dash.html' %}
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Panel Analytics - {{ plant.name }}{% endblock %}
+
+{% block content %}
+<h1 style="font-size:2rem; font-weight:bold; color:#0b3b0d; margin-bottom: 1em;">Panel Analytics: {{ plant.name }}</h1>
+<p><b>Location:</b> {{ plant.location }}</p>
+<p><b>Installed Capacity per Panel:</b> {{ installed_per_panel|floatformat:2 }} kW</p>
+<div style="overflow-x:auto; margin-bottom: 32px;">
+  <table border="1" cellpadding="8" cellspacing="0" style="width:100%; background:white; color:black; min-width:500px;">
+    <thead style="background:#0b3b0d; color:white;">
+      <tr>
+        <th>Panel</th>
+        <th>Actual Output (kW)</th>
+        <th>Efficiency (%)</th>
+        <th>สถานะ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in panel_data %}
+      <tr>
+        <td>{{ p.panel }}</td>
+        <td>{{ p.actual_output_kw|floatformat:2 }}</td>
+        <td>{{ p.efficiency|floatformat:2 }}%</td>
+        <td>
+          {% if p.efficiency >= 80 %}
+            <span style="color: #218838; font-weight: bold;">ปกติ</span>
+          {% elif p.efficiency >= 50 %}
+            <span style="color: #856404; font-weight: bold;">ปานกลาง</span>
+          {% else %}
+            <span style="color: #c82333; font-weight: bold;">ผิดปกติ</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No panel data available.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<a href="{% url 'data_analyst_analytics' %}" class="btn-outline">← Back to Analytics Overview</a>
+{% endblock %}
