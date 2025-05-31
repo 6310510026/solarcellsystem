@@ -9,9 +9,9 @@
 {% block content %}
   <h2>{{ plant.name }} - Detail</h2>
   <p><b>Location:</b> {{ plant.location }}</p>
-  <p><b>Owner:</b> {{ plant.owner.username }}</p>
-  <p><b>Data Analyst:</b> {{ plant.data_analyst.username }}</p>
-  <p><b>Drone Controller:</b> {{ plant.drone_controller.username }}</p>
+  <p><b>Owner:</b> {% if plant.owner.first_name or plant.owner.last_name %}{{ plant.owner.first_name }} {{ plant.owner.last_name }}{% else %}{{ plant.owner.username }}{% endif %}</p>
+  <p><b>Data Analyst:</b> {% if plant.data_analyst %}{% if plant.data_analyst.first_name or plant.data_analyst.last_name %}{{ plant.data_analyst.first_name }} {{ plant.data_analyst.last_name }}{% else %}{{ plant.data_analyst.username }}{% endif %}{% else %}-{% endif %}</p>
+  <p><b>Drone Controller:</b> {% if plant.drone_controller %}{% if plant.drone_controller.first_name or plant.drone_controller.last_name %}{{ plant.drone_controller.first_name }} {{ plant.drone_controller.last_name }}{% else %}{{ plant.drone_controller.username }}{% endif %}{% else %}-{% endif %}</p>
   <hr>
   <h3>Zones & Inspections</h3>
   {% for zone in zones %}
@@ -32,7 +32,7 @@
             <tr>
               <td>{{ insp.captured_date }} {{ insp.captured_time }}</td>
               <td>{{ insp.get_status_display }}</td>
-              <td>{% if insp.analyzed_by %}{{ insp.analyzed_by.username }}{% else %}-{% endif %}</td>
+              <td>{% if insp.analyzed_by %}{% if insp.analyzed_by.first_name or insp.analyzed_by.last_name %}{{ insp.analyzed_by.first_name }} {{ insp.analyzed_by.last_name }}{% else %}{{ insp.analyzed_by.username }}{% endif %}{% else %}-{% endif %}</td>
               <td>{{ insp.description|default:"-" }}</td>
               <td>
                 {% if insp.image %}

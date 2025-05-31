@@ -1,6 +1,6 @@
 <ul class="menu">
-    <li><a href="#">Dashboard</a></li>
-    <li><a href="#">Analytics</a></li>
+    <li><a href="{% url 'data_analyst_dashboard' %}" class="{% if request.resolver_match.url_name == 'data_analyst_dashboard' %}active{% endif %}">Dashboard</a></li>
+    <li><a href="{% url 'data_analyst_analytics' %}" class="{% if request.resolver_match.url_name == 'data_analyst_analytics' %}active{% endif %}">Analytics</a></li>
     <li><a href="#">Graphs</a></li>
     <li><a href="{% url 'logout_page' %}" class="green-link">Logout</a></li>
 </ul>

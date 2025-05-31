@@ -79,6 +79,9 @@ class SolarPanel(models.Model):
     column_number = models.PositiveIntegerField(verbose_name="คอลัมน์ที่")  # เช่น คอลัมน์ 1, 2, 3
     serial_number = models.CharField(max_length=100, blank=True, verbose_name="Serial Number")
     is_active = models.BooleanField(default=True, verbose_name="ใช้งานอยู่")
+    actual_output_kw = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="กำลังผลิตจริง (kW)"
+    )
 
     def __str__(self):
         return f"Panel R{self.row.row_number}-C{self.column_number} ({self.row.zone.name} / {self.row.zone.plant.name})"
