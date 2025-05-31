@@ -11,7 +11,8 @@
 <h1 style="font-size:2rem; font-weight:bold; color:#0b3b0d; margin-bottom: 1em;">Panel Analytics: {{ plant.name }}</h1>
 <p><b>Location:</b> {{ plant.location }}</p>
 <p><b>Installed Capacity per Panel:</b> {{ installed_per_panel|floatformat:2 }} kW</p>
-<div style="overflow-x:auto; margin-bottom: 32px;">
+<form method="post" style="margin-bottom: 32px;">
+  {% csrf_token %}
   <table border="1" cellpadding="8" cellspacing="0" style="width:100%; background:white; color:black; min-width:500px;">
     <thead style="background:#0b3b0d; color:white;">
       <tr>
@@ -25,7 +26,9 @@
       {% for p in panel_data %}
       <tr>
         <td>{{ p.panel }}</td>
-        <td>{{ p.actual_output_kw|floatformat:2 }}</td>
+        <td>
+          <input type="number" step="0.01" name="actual_output_{{ p.panel_id }}" value="{{ p.actual_output_kw|floatformat:2 }}" style="width:90px;">
+        </td>
         <td>{{ p.efficiency|floatformat:2 }}%</td>
         <td>
           {% if p.efficiency >= 80 %}
@@ -42,6 +45,115 @@
       {% endfor %}
     </tbody>
   </table>
+  <button type="submit" class="btn-green" style="margin-top:16px;">บันทึก Actual Output</button>
+</form>
+<div style="margin: 32px 0;">
+  <label for="panelSelect"><b>เลือก Panel:</b></label>
+  <select id="panelSelect">
+    <option value="all">รวมทุกแผง</option>
+    {% for p in panel_choices %}
+      <option value="{{ p.id }}">{{ p.name }}</option>
+    {% endfor %}
+  </select>
 </div>
+<canvas id="efficiencyChart" width="800" height="350"></canvas>
+<div style="max-width:400px;margin:32px auto 24px auto;">
+  <canvas id="panelStatusPie"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const efficiencyByTime = {{ efficiency_by_time|safe }};
+const panelEffByTime = {{ panel_eff_by_time|safe }};
+const panelChoices = [{id: 'all', name: 'รวมทุกแผง'}{% for p in panel_choices %}, {id: '{{p.id}}', name: '{{p.name}}'}{% endfor %}];
+
+function getChartData(panelId) {
+    if (panelId === 'all') {
+        return {
+            labels: efficiencyByTime.map(e => e.timestamp),
+            data: efficiencyByTime.map(e => e.efficiency)
+        };
+    } else {
+        const arr = panelEffByTime[panelId] || [];
+        return {
+            labels: arr.map(e => e.timestamp),
+            data: arr.map(e => e.efficiency)
+        };
+    }
+}
+
+let chart;
+function renderChart(panelId) {
+    const ctx = document.getElementById('efficiencyChart').getContext('2d');
+    const chartData = getChartData(panelId);
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Efficiency (%)',
+                data: chartData.data,
+                borderColor: '#6ec6ff', // ฟ้าอ่อน
+                backgroundColor: 'rgba(110,198,255,0.15)', // ฟ้าอ่อนจาง
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#6ec6ff',
+                pointRadius: 4,
+                fill: true,
+                tension: 0.25
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { labels: { color: '#333', font: { size: 15 } } }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: '#e3f2fd' },
+                    ticks: { color: '#333' }
+                },
+                x: {
+                    grid: { color: '#f5f5f5' },
+                    ticks: { color: '#333' }
+                }
+            }
+        }
+    });
+}
+
+document.getElementById('panelSelect').addEventListener('change', function() {
+    renderChart(this.value);
+});
+renderChart('all');
+
+// Pie Chart
+const pieCtx = document.getElementById('panelStatusPie').getContext('2d');
+const pieChart = new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: ['ปกติ (≥80%)', 'ปานกลาง (50-79%)', 'ผิดปกติ (<50%)'],
+        datasets: [{
+            data: [{{ normal_count }}, {{ medium_count }}, {{ abnormal_count }}],
+            backgroundColor: [
+                '#7ed957', // ปกติ: เขียวพาสเทล
+                '#ffe066', // ปานกลาง: เหลืองพาสเทล
+                '#ff7b7b'  // ผิดปกติ: แดงพาสเทล
+            ],
+            borderColor: [
+                '#b6eabf',
+                '#fff6c1',
+                '#ffc1c1'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { position: 'bottom', labels: { color: '#333', font: { size: 15 } } }
+        }
+    }
+});
+</script>
 <a href="{% url 'data_analyst_analytics' %}" class="btn-outline">← Back to Analytics Overview</a>
 {% endblock %}

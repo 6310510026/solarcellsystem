@@ -12,6 +12,20 @@
   <p><b>Owner:</b> {% if plant.owner.first_name or plant.owner.last_name %}{{ plant.owner.first_name }} {{ plant.owner.last_name }}{% else %}{{ plant.owner.username }}{% endif %}</p>
   <p><b>Data Analyst:</b> {% if plant.data_analyst %}{% if plant.data_analyst.first_name or plant.data_analyst.last_name %}{{ plant.data_analyst.first_name }} {{ plant.data_analyst.last_name }}{% else %}{{ plant.data_analyst.username }}{% endif %}{% else %}-{% endif %}</p>
   <p><b>Drone Controller:</b> {% if plant.drone_controller %}{% if plant.drone_controller.first_name or plant.drone_controller.last_name %}{{ plant.drone_controller.first_name }} {{ plant.drone_controller.last_name }}{% else %}{{ plant.drone_controller.username }}{% endif %}{% else %}-{% endif %}</p>
+  {% comment %} แสดงสถานะวิเคราะห์ล่าสุดของโรงไฟฟ้า {% endcomment %}
+  {% with last_report=plant.inspection_reports.last %}
+    <p><b>สถานะการวิเคราะห์:</b>
+      {% if last_report %}
+        {% if last_report.is_analyzed %}
+          <span style="color: #218838; font-weight: bold;">วิเคราะห์แล้ว</span>
+        {% else %}
+          <span style="color: #c82333; font-weight: bold;">ยังไม่วิเคราะห์</span>
+        {% endif %}
+      {% else %}
+        <span style="color: gray;">ไม่มีรายงาน</span>
+      {% endif %}
+    </p>
+  {% endwith %}
   <hr>
   <h3>Zones & Inspections</h3>
   {% for zone in zones %}

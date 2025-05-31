@@ -3,10 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from plant.models import SolarPlant, Zone
+from plant.models import SolarPlant, Zone, SolarPanel, PanelOutputLog
 from drone.models import DroneInspection
 from django.db.models import Count
 from django.db import models
+import json
+from datetime import datetime, timedelta
 
 User = get_user_model()
 
@@ -136,7 +138,6 @@ def plant_detail_analyst_view(request, plant_id):
 
 @login_required
 def data_analyst_analytics_view(request):
-    from plant.models import SolarPanel, SolarPlant, Zone
     # Filter เฉพาะโรงไฟฟ้าที่ data_analyst เป็น user ปัจจุบัน
     plants = SolarPlant.objects.filter(data_analyst=request.user).select_related('owner', 'data_analyst').prefetch_related('zones')
     plant_data = []
@@ -166,24 +167,96 @@ def data_analyst_analytics_view(request):
 
 @login_required
 def panel_analytics_view(request, plant_id):
-    from plant.models import SolarPanel, SolarPlant
     plant = get_object_or_404(SolarPlant, id=plant_id)
     panels = SolarPanel.objects.filter(row__zone__plant=plant).select_related('row')
     num_panels = panels.count()
     installed_per_panel = float(plant.installed_capacity_kw) / num_panels if num_panels and plant.installed_capacity_kw else 0
     panel_data = []
+    panel_choices = []
+
+    # --- Handle POST for updating actual_output_kw ---
+    if request.method == 'POST':
+        for panel in panels:
+            field_name = f'actual_output_{panel.id}'
+            if field_name in request.POST:
+                try:
+                    value = float(request.POST.get(field_name, '0'))
+                    panel.actual_output_kw = value
+                    panel.save()
+                except ValueError:
+                    pass  # ignore invalid input
+        return redirect('panel_analytics', plant_id=plant.id)
+
     for panel in panels:
         actual = float(panel.actual_output_kw) if panel.actual_output_kw is not None else 0
         efficiency = (actual / installed_per_panel * 100) if installed_per_panel else 0
         panel_data.append({
             'panel': f"R{panel.row.row_number}-C{panel.column_number}",
+            'panel_id': panel.id,
             'actual_output_kw': actual,
             'efficiency': efficiency,
         })
+        panel_choices.append({'id': panel.id, 'name': f"R{panel.row.row_number}-C{panel.column_number}"})
+
+    # --- Efficiency by time (all panels) ---
+    logs = PanelOutputLog.objects.filter(panel__row__zone__plant=plant)
+    if logs.exists():
+        time_eff = {}
+        for log in logs.order_by('timestamp'):
+            t = log.timestamp.strftime('%Y-%m-%d %H:%M')
+            if t not in time_eff:
+                time_eff[t] = {'actual_sum': 0, 'count': 0}
+            time_eff[t]['actual_sum'] += float(log.output_kw)
+            time_eff[t]['count'] += 1
+        efficiency_by_time = []
+        for t, v in time_eff.items():
+            installed_sum = installed_per_panel * v['count']
+            eff = (v['actual_sum'] / installed_sum * 100) if installed_sum else 0
+            efficiency_by_time.append({'timestamp': t, 'efficiency': eff})
+        # Per panel
+        panel_eff_by_time = {}
+        for panel in panels:
+            logs = panel.output_logs.order_by('timestamp')
+            panel_eff_by_time[panel.id] = [
+                {
+                    'timestamp': log.timestamp.strftime('%Y-%m-%d %H:%M'),
+                    'efficiency': (float(log.output_kw) / installed_per_panel * 100) if installed_per_panel else 0
+                }
+                for log in logs
+            ]
+    else:
+        # MOCK: สร้างข้อมูล 7 วันย้อนหลัง (ทุกวัน)
+        now = datetime.now()
+        efficiency_by_time = []
+        panel_eff_by_time = {}
+        for i in range(7, 0, -1):
+            ts = (now - timedelta(days=i)).strftime('%Y-%m-%d %H:%M')
+            eff = sum(p['efficiency'] for p in panel_data) / len(panel_data) if panel_data else 0
+            efficiency_by_time.append({'timestamp': ts, 'efficiency': eff})
+        for idx, panel in enumerate(panels):
+            panel_eff_by_time[panel.id] = [
+                {
+                    'timestamp': (now - timedelta(days=i)).strftime('%Y-%m-%d %H:%M'),
+                    'efficiency': float(panel_data[idx]['efficiency']) if len(panel_data) > idx else 0
+                }
+                for i in range(7, 0, -1)
+            ]
+
+    # Pie chart data for panel status
+    normal_count = sum(1 for p in panel_data if p['efficiency'] >= 80)
+    medium_count = sum(1 for p in panel_data if 50 <= p['efficiency'] < 80)
+    abnormal_count = sum(1 for p in panel_data if p['efficiency'] < 50)
+
     context = {
         'plant': plant,
         'panel_data': panel_data,
         'installed_per_panel': installed_per_panel,
+        'efficiency_by_time': json.dumps(efficiency_by_time),
+        'panel_eff_by_time': json.dumps(panel_eff_by_time),
+        'panel_choices': panel_choices,
+        'normal_count': normal_count,
+        'medium_count': medium_count,
+        'abnormal_count': abnormal_count,
     }
     return render(request, 'dashboard/panel_analytics.html', context)
 
