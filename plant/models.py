@@ -98,3 +98,12 @@ class InspectionReport(models.Model):
 
     def __str__(self):
         return f"Report for {self.plant.name} on {self.report_date}"
+
+# 6. ประวัติการผลิตของแผงโซลาร์เซลล์
+class PanelOutputLog(models.Model):
+    panel = models.ForeignKey(SolarPanel, on_delete=models.CASCADE, related_name='output_logs')
+    timestamp = models.DateTimeField()
+    output_kw = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.panel} @ {self.timestamp} = {self.output_kw} kW"
