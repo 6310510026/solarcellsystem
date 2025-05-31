@@ -136,9 +136,9 @@ def plant_detail_analyst_view(request, plant_id):
 
 @login_required
 def data_analyst_analytics_view(request):
-    from plant.models import SolarPanel
-    # Filter only plants where the data_analyst is the current user
-    plants = SolarPlant.objects.filter(data_analyst=request.user).select_related('owner', 'data_analyst')
+    from plant.models import SolarPanel, SolarPlant, Zone
+    # Filter เฉพาะโรงไฟฟ้าที่ data_analyst เป็น user ปัจจุบัน
+    plants = SolarPlant.objects.filter(data_analyst=request.user).select_related('owner', 'data_analyst').prefetch_related('zones')
     plant_data = []
     for plant in plants:
         panels = SolarPanel.objects.filter(row__zone__plant=plant)
@@ -150,13 +150,14 @@ def data_analyst_analytics_view(request):
             actual_sum = sum(float(p.actual_output_kw or 0) for p in panels)
             installed_sum = installed_per_panel * num_panels
             efficiency = (actual_sum / installed_sum * 100) if installed_sum else 0
+        zones = plant.zones.all()
         plant_data.append({
             'id': plant.id,
             'name': plant.name,
             'location': plant.location,
             'owner': plant.owner.username,
-            'data_analyst': plant.data_analyst.username if plant.data_analyst else '-',
             'efficiency': efficiency,
+            'zones': zones,
         })
     context = {
         'plant_data': plant_data,

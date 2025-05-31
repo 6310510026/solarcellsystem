@@ -14,6 +14,7 @@
     <thead style="background:#0b3b0d; color:white;">
       <tr>
         <th>ชื่อโรงไฟฟ้า</th>
+        <th>Zone</th>
         <th>ที่ตั้ง</th>
         <th>Owner</th>
         <th>ประสิทธิภาพโดยรวม (%)</th>
@@ -24,6 +25,11 @@
       {% for plant in plant_data %}
       <tr>
         <td>{{ plant.name }}</td>
+        <td>
+          {% if plant.zones and plant.zones|length > 0 %}
+            {% for zone in plant.zones %}{{ zone.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          {% else %}-{% endif %}
+        </td>
         <td>{{ plant.location }}</td>
         <td>{{ plant.owner }}</td>
         <td>{% if plant.efficiency != None %}{{ plant.efficiency|floatformat:2 }}{% else %}-{% endif %}</td>
@@ -37,7 +43,7 @@
         </td>
       </tr>
       {% empty %}
-      <tr><td colspan="5">No plant data available.</td></tr>
+      <tr><td colspan="6">No plant data available.</td></tr>
       {% endfor %}
     </tbody>
   </table>
