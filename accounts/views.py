@@ -3,7 +3,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from .models import CustomUser
+from plant.models import SolarPlant, Zone
+from drone.models import DroneInspection
+from django.db.models import Count
+from django.db import models
 
 User = get_user_model()
 
@@ -89,8 +92,6 @@ def plant_owner_dashboard_view(request):
 
 @login_required
 def data_analyst_dashboard_view(request):
-    from plant.models import SolarPlant, Zone
-    from drone.models import DroneInspection
     plants = SolarPlant.objects.all().prefetch_related('zones', 'owner')
     plant_name = request.GET.get('plant_name', '').strip()
     zone_name = request.GET.get('zone_name', '').strip()
@@ -126,7 +127,6 @@ def site_admin_dashboard_view(request):
 
 @login_required
 def plant_detail_analyst_view(request, plant_id):
-    from plant.models import SolarPlant
     plant = get_object_or_404(SolarPlant, id=plant_id)
     zones = plant.zones.prefetch_related('droneinspection_set')
     return render(request, 'dashboard/plant_detail_analyst.html', {
@@ -134,21 +134,58 @@ def plant_detail_analyst_view(request, plant_id):
         'zones': zones,
     })
 
-
+@login_required
+def data_analyst_analytics_view(request):
+    from plant.models import SolarPanel, SolarPlant, Zone
+    # Filter เฉพาะโรงไฟฟ้าที่ data_analyst เป็น user ปัจจุบัน
+    plants = SolarPlant.objects.filter(data_analyst=request.user).select_related('owner', 'data_analyst').prefetch_related('zones')
+    plant_data = []
+    for plant in plants:
+        panels = SolarPanel.objects.filter(row__zone__plant=plant)
+        num_panels = panels.count()
+        if num_panels == 0 or not plant.installed_capacity_kw:
+            efficiency = None
+        else:
+            installed_per_panel = float(plant.installed_capacity_kw) / num_panels
+            actual_sum = sum(float(p.actual_output_kw or 0) for p in panels)
+            installed_sum = installed_per_panel * num_panels
+            efficiency = (actual_sum / installed_sum * 100) if installed_sum else 0
+        zones = plant.zones.all()
+        plant_data.append({
+            'id': plant.id,
+            'name': plant.name,
+            'location': plant.location,
+            'owner': plant.owner.username,
+            'efficiency': efficiency,
+            'zones': zones,
+        })
+    context = {
+        'plant_data': plant_data,
+    }
+    return render(request, 'dashboard/analytics.html', context)
 
 @login_required
-def complete_profile(request):
-    user = request.user
-
-    if request.method == 'POST':
-        role = request.POST.get('role')
-        if role in ['plant_owner', 'data_analyst', 'drone_controller']:
-            user.role = role
-            user.is_active = False  # deactivate จนกว่า admin จะอนุมัติ
-            user.save()
-            messages.success(request, "Registration successful. Await admin approval.")
-            return redirect('login_page')  # แจ้งให้รอ approval
-    return render(request, 'select_role.html')
+def panel_analytics_view(request, plant_id):
+    from plant.models import SolarPanel, SolarPlant
+    plant = get_object_or_404(SolarPlant, id=plant_id)
+    panels = SolarPanel.objects.filter(row__zone__plant=plant).select_related('row')
+    num_panels = panels.count()
+    installed_per_panel = float(plant.installed_capacity_kw) / num_panels if num_panels and plant.installed_capacity_kw else 0
+    panel_data = []
+    for panel in panels:
+        actual = float(panel.actual_output_kw) if panel.actual_output_kw is not None else 0
+        efficiency = (actual / installed_per_panel * 100) if installed_per_panel else 0
+        panel_data.append({
+            'panel': f"R{panel.row.row_number}-C{panel.column_number}",
+            'actual_output_kw': actual,
+            'efficiency': efficiency,
+        })
+    context = {
+        'plant': plant,
+        'panel_data': panel_data,
+        'installed_per_panel': installed_per_panel,
+    }
+    return render(request, 'dashboard/panel_analytics.html', context)
 
 @login_required
 def complete_profile(request):

@@ -33,6 +33,7 @@
                 <th>Solar Plant Name</th>
                 <th>Zone</th>
                 <th>Owner</th>
+                <th>Data Analyst</th>
                 <th>Status</th>
                 <th>Details</th>
             </tr>
@@ -44,6 +45,7 @@
                         <td>{{ plant.name }}</td>
                         <td>{{ zone.name }}</td>
                         <td>{{ plant.owner.username }}</td>
+                        <td>{% if plant.data_analyst %}{{ plant.data_analyst.username }}{% else %}-{% endif %}</td>
                         <td>
                             {# แสดง status ล่าสุดของ inspection ใน zone นี้ #}
                             {% with inspections=zone.droneinspection_set.all|dictsortreversed:"captured_at" %}
@@ -63,6 +65,7 @@
                         <td>{{ plant.name }}</td>
                         <td>-</td>
                         <td>{{ plant.owner.username }}</td>
+                        <td>{% if plant.data_analyst %}{{ plant.data_analyst.username }}{% else %}-{% endif %}</td>
                         <td>-</td>
                         <td>
                             <a href="{% url 'plant_detail_analyst' plant.id %}" style="background:#1a73e8; color:white; padding:6px 14px; border-radius:5px; text-decoration:none;">View</a>
@@ -70,7 +73,7 @@
                     </tr>
                 {% endfor %}
             {% empty %}
-                <tr><td colspan="5">No data available.</td></tr>
+                <tr><td colspan="6">No data available.</td></tr>
             {% endfor %}
         </tbody>
     </table>

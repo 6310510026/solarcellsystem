@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import DroneInspection, Notification
+from .models import DroneInspection
 from plant.models import SolarPlant, Zone
 from .forms import DroneInspectionForm # คุณต้องมี forms.py และ DroneInspectionForm ที่ถูกต้อง
 from django.conf import settings # ถ้าคุณใช้ settings เช่น settings.AUTH_USER_MODEL โดยตรง
@@ -27,27 +27,16 @@ def upload_inspection(request):
     zone = Zone.objects.get(id=zone_id)
 
     if request.method == 'POST':
-        form = DroneInspectionForm(request.POST, request.FILES)
+        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user)
         if form.is_valid():
             inspection = form.save(commit=False)
             inspection.captured_by = request.user
             inspection.captured_date = date.today()
             inspection.zone = zone
             inspection.save()
-
-            # ✅ สร้าง Notification สำหรับ Drone Controller
-            Notification.objects.create(
-                user=request.user,
-                message=f"You have uploaded a new task for zone '{zone.name}' in plant '{zone.plant.name}'.",
-                type='task_status',
-                link='/drone/status/'
-            )
-            print("✅ Notification created")
-
-
-            return redirect('notifications')
+        return redirect('drone_status')
     else:
-        form = DroneInspectionForm()
+        form = DroneInspectionForm(request.POST or None, request.FILES or None, user=request.user)
 
     return render(request, 'dashboard/upload_inspection.html', {
         'form': form,
@@ -154,13 +143,6 @@ def drone_task_view(request):
     return render(request, 'dashboard/drone_tasks.html', {
         'today': today,
         'tasks': tasks,
-    })
-
-@login_required
-def notification_view(request):
-    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'dashboard/notifications.html', {
-        'notifications': notifications
     })
 
 
