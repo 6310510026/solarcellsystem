@@ -161,8 +161,8 @@ AUTHENTICATION_BACKENDS = (
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id':'907102278294-jutera6819h1535gcopg0selnoqn3prl.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id':'',
+            'secret': '',
           
         },
         'SCOPE': ['profile','email',],
@@ -189,8 +189,8 @@ CSRF_TRUSTED_ORIGINS = [
     
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '907102278294-jutera6819h1535gcopg0selnoqn3prl.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
 
 # settings.py
 LOGIN_REDIRECT_URL = '/accounts/complete-profile/'
